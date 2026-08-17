@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Test Supabase</title>
+<style>
+  body { font-family: monospace; padding: 20px; background: #111; color: #0f0; }
+  .ok { color: #0f0; }
+  .err { color: #f00; }
+  pre { background: #222; padding: 10px; white-space: pre-wrap; margin: 10px 0; }
+  button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+</style>
+</head>
+<body>
+<h2>Supabase Diagnostic Test</h2>
+<div id="log"></div>
+<button onclick="testSelect()">1. Test SELECT (articles)</button>
+<button onclick="testInsert()">2. Test INSERT (articles)</button>
+<button onclick="testProfile()">3. Test SELECT (profile)</button>
+<button onclick="testInsertProfile()">4. Test INSERT (profile)</button>
+<button onclick="testStorage()">5. Test Storage bucket</button>
+<button onclick="testAuth()">6. Test Auth status</button>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const URL = 'https://ynrgauifgghtjogaxzcz.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucmdhdWlmZ2dodGpvZ2F4emN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5NTAyMTcsImV4cCI6MjEwMjUyNjIxN30.Bjeb68YsAAKhsgsXtEGIOem1HsZr4HybgB6-T0aL3V0';
+const sb = supabase.createClient(URL, KEY);
+
+function log(msg, cls) {
+  const d = document.getElementById('log');
+  const pre = document.createElement('pre');
+  pre.className = cls || '';
+  pre.textContent = new Date().toLocaleTimeString() + ' — ' + msg;
+  d.prepend(pre);
+}
+
+async function testSelect() {
+  log('SELECT articles...');
+  const r = await sb.from('articles').select('*');
+  log('SELECT articles: ' + JSON.stringify(r), r.error ? 'err' : 'ok');
+}
+
+async function testInsert() {
+  log('INSERT articles...');
+  const r = await sb.from('articles').insert({ title: 'Test dari diagnostic', body: 'Hello' });
+  log('INSERT articles: ' + JSON.stringify(r), r.error ? 'err' : 'ok');
+}
+
+async function testProfile() {
+  log('SELECT profile...');
+  const r = await sb.from('profile').select('*').limit(5);
+  log('SELECT profile: ' + JSON.stringify(r), r.error ? 'err' : 'ok');
+}
+
+async function testInsertProfile() {
+  log('INSERT profile...');
+  const r = await sb.from('profile').insert({ initials: 'ZN', name: 'Test User', role: 'Dev', bio: 'test', location: 'ID', email: 'test@test.com' });
+  log('INSERT profile: ' + JSON.stringify(r), r.error ? 'err' : 'ok');
+}
+
+async function testStorage() {
+  log('List storage gallery...');
+  const r = await sb.storage.from('gallery').list('uploads');
+  log('Storage list: ' + JSON.stringify(r), r.error ? 'err' : 'ok');
+}
+
+async function testAuth() {
+  log('Check auth session...');
+  const r = await sb.auth.getSession();
+  log('Auth session: ' + JSON.stringify({ hasSession: !!r.data?.session, error: r.error }), r.error ? 'err' : 'ok');
+}
+
+log('Ready. Click buttons to test.');
+</script>
+</body>
+</html>
