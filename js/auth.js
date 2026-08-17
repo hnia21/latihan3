@@ -1,8 +1,6 @@
 (() => {
   'use strict';
 
-  const ADMIN_EMAIL = APP_CONFIG.ADMIN_EMAIL;
-
   async function checkAuth() {
     const { data: { session } } = await APP.sb.auth.getSession();
     APP.state.loggedIn = !!session;
@@ -15,8 +13,6 @@
     const email = APP.$(viewLogin, '[data-email-input]');
     const pw    = APP.$(viewLogin, '[data-password-input]');
     const err   = APP.$(viewLogin, '[data-login-error]');
-
-    email.value = ADMIN_EMAIL;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();

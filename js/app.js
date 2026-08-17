@@ -51,13 +51,24 @@
   const viewArticle     = document.getElementById('view-article');
   const viewAllArticles = document.getElementById('view-all-articles');
   const viewAllKarya    = document.getElementById('view-all-karya');
-  const allViews = [viewPublic, viewArticle, viewAllArticles, viewAllKarya];
+  const viewAllGallery  = document.getElementById('view-all-gallery');
+  const allViews = [viewPublic, viewArticle, viewAllArticles, viewAllKarya, viewAllGallery];
 
   function hideAll() { allViews.forEach(v => { v.hidden = true; }); }
   function $(c, s) { return c.querySelector(s); }
   function $all(c, s) { return c.querySelectorAll(s); }
 
   const MAX_ITEMS = 3;
+
+  function fillFooter(scope) {
+    const p = state.profile || {};
+    $all(scope, '[data-footer-name]').forEach(e => e.textContent = p.name || 'Nama Anda');
+    $all(scope, '[data-footer-name-2]').forEach(e => e.textContent = p.name || 'Nama Anda');
+    $all(scope, '[data-footer-mark]').forEach(e => e.textContent = p.initials || 'ZP');
+    $all(scope, '[data-footer-role]').forEach(e => e.textContent = p.role || 'Peran / profesi Anda');
+    const fy = $(scope, '[data-footer-year]');
+    if (fy) fy.textContent = new Date().getFullYear();
+  }
 
   function renderPublic() {
     viewPublic.innerHTML = VIEWS.public();
@@ -90,6 +101,8 @@
           '<div class="gallery-item__caption">' + escapeHtml(g.caption || g.title) + '</div></div>'
       ).join('');
     }
+    const gmb = $(viewPublic, '[data-gallery-more]');
+    if (gmb) gmb.style.display = state.gallery.length > MAX_ITEMS ? '' : 'none';
 
     const al = $(viewPublic, '[data-article-list]');
     if (state.articles.length === 0) {
@@ -130,13 +143,45 @@
     setupReveal(viewPublic);
   }
 
-  function renderAllArticles() {
+  function renderAllGallery(query) {
+    viewAllGallery.innerHTML = VIEWS.allGallery();
+    const wrap = $(viewAllGallery, '[data-all-gallery-list]');
+    const q = (query || '').toLowerCase();
+    const filtered = q ? state.gallery.filter(g =>
+      (g.title || '').toLowerCase().includes(q)
+    ) : state.gallery;
+    if (filtered.length === 0) {
+      wrap.innerHTML = '<p class="empty-note">' + (q ? 'Tidak ada foto yang cocok.' : 'Belum ada foto di galeri.') + '</p>';
+    } else {
+      wrap.innerHTML = filtered.map((g, i) =>
+        '<div class="gallery-item" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
+          (g.image_url
+            ? '<img src="' + escapeHtml(g.image_url) + '" alt="' + escapeHtml(g.title) + '" loading="lazy">'
+            : '<div class="gallery-item--empty">' + escapeHtml((g.title || '?').charAt(0).toUpperCase()) + '</div>') +
+          '<div class="gallery-item__caption">' + escapeHtml(g.caption || g.title) + '</div></div>'
+      ).join('');
+    }
+    const input = $(viewAllGallery, '[data-search-galeri]');
+    if (input) {
+      input.value = query || '';
+      input.addEventListener('input', () => { renderAllGallery(input.value); });
+      input.focus();
+    }
+    fillFooter(viewAllGallery);
+    setupReveal(viewAllGallery);
+  }
+
+  function renderAllArticles(query) {
     viewAllArticles.innerHTML = VIEWS.allArticles();
     const wrap = $(viewAllArticles, '[data-all-articles-list]');
-    if (state.articles.length === 0) {
-      wrap.innerHTML = '<p class="empty-note">Belum ada artikel.</p>';
+    const q = (query || '').toLowerCase();
+    const filtered = q ? state.articles.filter(a =>
+      (a.title || '').toLowerCase().includes(q) || (a.author || '').toLowerCase().includes(q)
+    ) : state.articles;
+    if (filtered.length === 0) {
+      wrap.innerHTML = '<p class="empty-note">' + (q ? 'Tidak ada artikel yang cocok.' : 'Belum ada artikel.') + '</p>';
     } else {
-      wrap.innerHTML = state.articles.map((a, i) =>
+      wrap.innerHTML = filtered.map((a, i) =>
         '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
           (a.image_url ? '<img class="stub-card__image" src="' + escapeHtml(a.image_url) + '" alt="' + escapeHtml(a.title) + '" loading="lazy">' : '') +
           '<div class="stub-card__content">' +
@@ -147,16 +192,27 @@
           '</div></article>'
       ).join('');
     }
+    const input = $(viewAllArticles, '[data-search-artikel]');
+    if (input) {
+      input.value = query || '';
+      input.addEventListener('input', () => { renderAllArticles(input.value); });
+      input.focus();
+    }
+    fillFooter(viewAllArticles);
     setupReveal(viewAllArticles);
   }
 
-  function renderAllKarya() {
+  function renderAllKarya(query) {
     viewAllKarya.innerHTML = VIEWS.allKarya();
     const wrap = $(viewAllKarya, '[data-all-karya-list]');
-    if (state.karya.length === 0) {
-      wrap.innerHTML = '<p class="empty-note">Belum ada karya.</p>';
+    const q = (query || '').toLowerCase();
+    const filtered = q ? state.karya.filter(k =>
+      (k.title || '').toLowerCase().includes(q) || (k.category || '').toLowerCase().includes(q)
+    ) : state.karya;
+    if (filtered.length === 0) {
+      wrap.innerHTML = '<p class="empty-note">' + (q ? 'Tidak ada karya yang cocok.' : 'Belum ada karya.') + '</p>';
     } else {
-      wrap.innerHTML = state.karya.map((k, i) =>
+      wrap.innerHTML = filtered.map((k, i) =>
         '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
           (k.image_url ? '<img class="stub-card__image" src="' + escapeHtml(k.image_url) + '" alt="' + escapeHtml(k.title) + '" loading="lazy">' : '') +
           '<div class="stub-card__content">' +
@@ -167,6 +223,13 @@
           '</div></article>'
       ).join('');
     }
+    const input = $(viewAllKarya, '[data-search-karya]');
+    if (input) {
+      input.value = query || '';
+      input.addEventListener('input', () => { renderAllKarya(input.value); });
+      input.focus();
+    }
+    fillFooter(viewAllKarya);
     setupReveal(viewAllKarya);
   }
 
@@ -187,6 +250,7 @@
     if (/<[a-z][\s\S]*>/i.test(body)) bodyEl.innerHTML = sanitizeRichHtml(body);
     else bodyEl.textContent = body;
     document.title = article.title;
+    fillFooter(viewArticle);
   }
 
   function setupReveal(scope) {
@@ -211,6 +275,9 @@
       else { location.hash = '#/'; }
     }
 
+    if (route === '/semua-galeri') {
+      await refreshPublicData(); renderAllGallery(); viewAllGallery.hidden = false; window.scrollTo({ top: 0 }); return;
+    }
     if (route === '/semua-artikel') {
       await refreshPublicData(); renderAllArticles(); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
     }
@@ -222,9 +289,21 @@
 
     if (route === '/artikel') $(viewPublic, '#artikel')?.scrollIntoView({ behavior: 'smooth' });
     else if (route === '/karya') $(viewPublic, '#karya')?.scrollIntoView({ behavior: 'smooth' });
-    else if (route === '/galeri') $(viewPublic, '#galeri')?.scrollIntoView({ behavior: 'smooth' });
   }
 
   window.addEventListener('hashchange', router);
   router();
+
+  let logoClicks = 0;
+  let logoTimer = null;
+  const brand = document.querySelector('.topbar__brand');
+  if (brand) {
+    brand.addEventListener('click', (e) => {
+      e.preventDefault();
+      logoClicks++;
+      clearTimeout(logoTimer);
+      logoTimer = setTimeout(() => { logoClicks = 0; }, 2000);
+      if (logoClicks >= 5) { logoClicks = 0; location.href = 'admin.html'; }
+    });
+  }
 })();

@@ -30,6 +30,7 @@ window.ADMIN_VIEWS = {
         <button data-tab="galeri" class="admin__tab">Galeri</button>
         <button data-tab="artikel" class="admin__tab">Artikel</button>
         <button data-tab="karya" class="admin__tab">Karya</button>
+        <button data-tab="keamanan" class="admin__tab">Keamanan</button>
       </nav>
       <button class="btn btn--ghost admin__logout" data-logout>Keluar</button>
     </aside>
@@ -176,6 +177,23 @@ window.ADMIN_VIEWS = {
           </div>
         </form>
         <div class="admin-list" data-karya-admin-list></div>
+      </div>
+
+      <div class="admin__panel" data-panel="keamanan">
+        <h2>Ubah Kata Sandi</h2>
+        <form data-password-form class="stack">
+          <label class="field">
+            <span>Kata sandi baru</span>
+            <input type="password" data-pw-new minlength="6" required autocomplete="new-password">
+          </label>
+          <label class="field">
+            <span>Konfirmasi kata sandi baru</span>
+            <input type="password" data-pw-confirm minlength="6" required autocomplete="new-password">
+          </label>
+          <p class="field-error" data-pw-error hidden></p>
+          <p class="save-note" data-pw-saved hidden>Kata sandi berhasil diubah.</p>
+          <button type="submit" class="btn btn--primary">Simpan kata sandi</button>
+        </form>
       </div>
 
     </div>

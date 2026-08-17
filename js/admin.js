@@ -90,6 +90,7 @@
     initGalleryForm();
     initArticleForm();
     initKaryaForm();
+    initPasswordForm();
   }
 
   function initAdminTabs() {
@@ -312,6 +313,44 @@
         '<div><div class="admin-row__title">' + escapeHtml(k.title) + '</div><div class="admin-row__meta">' + escapeHtml(k.category||'-') + '</div></div></div>' +
         '<div class="admin-row__actions"><button data-edit>Ubah</button><button data-delete class="danger">Hapus</button></div></div>'
     ).join('');
+  }
+
+  // ── password ────────────────────────────────────────────────────
+  function initPasswordForm() {
+    const form    = $(viewAdmin, '[data-password-form]');
+    const newPw   = $(viewAdmin, '[data-pw-new]');
+    const confirm = $(viewAdmin, '[data-pw-confirm]');
+    const err     = $(viewAdmin, '[data-pw-error]');
+    const saved   = $(viewAdmin, '[data-pw-saved]');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.hidden = true;
+      saved.hidden = true;
+      if (newPw.value.length < 6) {
+        err.textContent = 'Kata sandi minimal 6 karakter.';
+        err.hidden = false;
+        return;
+      }
+      if (newPw.value !== confirm.value) {
+        err.textContent = 'Konfirmasi kata sandi tidak cocok.';
+        err.hidden = false;
+        return;
+      }
+      const btn = form.querySelector('button[type="submit"]');
+      setBusy(btn, true, 'Menyimpan...');
+      try {
+        const { error } = await sb.auth.updateUser({ password: newPw.value });
+        if (error) throw new Error(error.message);
+        saved.hidden = false;
+        newPw.value = '';
+        confirm.value = '';
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.hidden = false;
+      } finally {
+        setBusy(btn, false);
+      }
+    });
   }
 
   router();
