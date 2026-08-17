@@ -12,9 +12,10 @@
 
 <!-- ============ NAV ============ -->
 <header class="topbar">
-  <a href="#/" class="brandmark" data-brandmark>ZP</a>
+  <a href="#/" class="brandmark" data-brandmark data-brandmark-secret>ZH</a>
   <nav class="toplinks">
     <a href="#/">Profil</a>
+    <a href="#/galeri">Galeri</a>
     <a href="#/artikel">Artikel</a>
     <a href="#/karya">Karya</a>
   </nav>
@@ -40,10 +41,21 @@
     <div class="id-card__perf" aria-hidden="true"></div>
   </section>
 
+  <!-- --- GALERI --- -->
+  <section class="section" id="galeri">
+    <div class="section__head">
+      <p class="section__eyebrow">002 — Visual</p>
+      <h2>Galeri</h2>
+    </div>
+    <div class="gallery-grid" data-gallery-list>
+      <p class="empty-note">Belum ada foto di galeri. Tambahkan lewat panel admin.</p>
+    </div>
+  </section>
+
   <!-- --- ARTIKEL PREVIEW --- -->
   <section class="section" id="artikel">
     <div class="section__head">
-      <p class="section__eyebrow">002 — Tulisan</p>
+      <p class="section__eyebrow">003 — Tulisan</p>
       <h2>Artikel terbaru</h2>
     </div>
     <div class="stub-grid" data-article-list>
@@ -54,7 +66,7 @@
   <!-- --- KARYA PREVIEW --- -->
   <section class="section" id="karya">
     <div class="section__head">
-      <p class="section__eyebrow">003 — Karya</p>
+      <p class="section__eyebrow">004 — Karya</p>
       <h2>Karya pilihan</h2>
     </div>
     <div class="stub-grid" data-karya-list>
@@ -63,8 +75,20 @@
   </section>
 
   <footer class="footer">
-    <span data-footer-name>Nama Anda</span>
-    <a href="#/admin" class="footer__admin-link">Masuk sebagai admin</a>
+    <div class="footer__brand">
+      <span class="footer__mark" data-footer-mark>ZP</span>
+      <div class="footer__brand-text">
+        <span class="footer__name" data-footer-name>Nama Anda</span>
+        <span class="footer__tagline" data-footer-role>Peran / profesi Anda</span>
+      </div>
+    </div>
+    <nav class="footer__links">
+      <a href="#/">Profil</a>
+      <a href="#/galeri">Galeri</a>
+      <a href="#/artikel">Artikel</a>
+      <a href="#/karya">Karya</a>
+    </nav>
+    <p class="footer__copy">&copy; <span data-footer-year></span> <span data-footer-name-2>Nama Anda</span>. Seluruh hak cipta dilindungi.</p>
   </footer>
 
 </main>
@@ -75,7 +99,11 @@
     <a href="#/" class="article-detail__back">&larr; Kembali</a>
     <p class="article-detail__eyebrow">Artikel</p>
     <h1 data-ad-title>Judul artikel</h1>
-    <p class="article-detail__date" data-ad-date></p>
+    <div class="article-detail__meta-row">
+      <span class="article-detail__author" data-ad-author hidden></span>
+      <span class="article-detail__date" data-ad-date></span>
+    </div>
+    <img class="article-detail__image" data-ad-image hidden alt="">
     <div class="article-detail__body" data-ad-body></div>
   </article>
 </main>
@@ -84,18 +112,14 @@
 <main id="view-login" hidden>
   <section class="auth">
     <div class="auth__card">
-      <p class="auth__eyebrow" data-auth-eyebrow>004 — Akses admin</p>
-      <h1 data-auth-title>Masuk</h1>
-      <p class="auth__desc" data-auth-desc>Masukkan kata sandi untuk mengelola konten.</p>
+      <p class="auth__eyebrow">005 — Akses admin</p>
+      <h1>Masuk</h1>
+      <p class="auth__desc">Masukkan kata sandi untuk mengelola konten.</p>
 
       <form data-login-form>
         <label class="field">
           <span>Kata sandi</span>
           <input type="password" data-password-input autocomplete="current-password" required>
-        </label>
-        <label class="field" data-confirm-field hidden>
-          <span>Ulangi kata sandi</span>
-          <input type="password" data-confirm-input autocomplete="new-password">
         </label>
         <p class="field-error" data-login-error hidden></p>
         <button type="submit" class="btn btn--primary" data-login-submit>Masuk</button>
@@ -113,6 +137,7 @@
       <p class="admin__eyebrow">Panel admin</p>
       <nav class="admin__nav">
         <button data-tab="profil" class="admin__tab is-active">Profil</button>
+        <button data-tab="galeri" class="admin__tab">Galeri</button>
         <button data-tab="artikel" class="admin__tab">Artikel</button>
         <button data-tab="karya" class="admin__tab">Karya</button>
       </nav>
@@ -156,22 +181,74 @@
         </form>
       </div>
 
+      <!-- TAB: GALERI -->
+      <div class="admin__panel" data-panel="galeri">
+        <h2>Galeri</h2>
+        <form data-gallery-form class="stack">
+          <label class="field">
+            <span>Judul foto</span>
+            <input type="text" data-g-title required>
+          </label>
+          <label class="field">
+            <span>Keterangan (opsional)</span>
+            <input type="text" data-g-caption>
+          </label>
+          <label class="field">
+            <span>Gambar (opsional)</span>
+            <input type="file" accept="image/*" data-g-image>
+            <span class="field-hint" data-g-image-status></span>
+          </label>
+          <button type="submit" class="btn btn--primary" data-g-submit>Tambah ke galeri</button>
+        </form>
+        <div class="admin-list" data-gallery-admin-list></div>
+      </div>
+
       <!-- TAB: ARTIKEL -->
       <div class="admin__panel" data-panel="artikel">
         <h2>Artikel</h2>
-        <form data-article-form class="stack">
+        <form data-article-form class="stack stack--wide">
           <input type="hidden" data-a-id>
-          <label class="field">
-            <span>Judul</span>
-            <input type="text" data-a-title required>
-          </label>
+          <div class="field-row">
+            <label class="field">
+              <span>Judul</span>
+              <input type="text" data-a-title required>
+            </label>
+            <label class="field">
+              <span>Penulis</span>
+              <input type="text" data-a-author placeholder="misal: Zidan Pratama">
+            </label>
+          </div>
           <label class="field">
             <span>Ringkasan</span>
             <textarea data-a-excerpt rows="3"></textarea>
           </label>
           <label class="field">
             <span>Isi artikel</span>
-            <textarea data-a-body rows="6"></textarea>
+            <div class="editor" data-a-editor-wrap>
+              <div class="editor__toolbar" data-a-toolbar>
+                <button type="button" class="editor__btn" data-cmd="bold" title="Tebal (Ctrl+B)"><b>B</b></button>
+                <button type="button" class="editor__btn" data-cmd="italic" title="Miring (Ctrl+I)"><i>I</i></button>
+                <button type="button" class="editor__btn" data-cmd="underline" title="Garis bawah (Ctrl+U)"><u>U</u></button>
+                <span class="editor__sep"></span>
+                <button type="button" class="editor__btn" data-cmd="justifyLeft" title="Rata kiri">⯇</button>
+                <button type="button" class="editor__btn" data-cmd="justifyCenter" title="Rata tengah">≡</button>
+                <button type="button" class="editor__btn" data-cmd="justifyRight" title="Rata kanan">⯈</button>
+                <button type="button" class="editor__btn" data-cmd="justifyFull" title="Rata kanan-kiri">☰</button>
+                <span class="editor__sep"></span>
+                <button type="button" class="editor__btn" data-cmd="insertUnorderedList" title="Daftar bullet">•—</button>
+                <button type="button" class="editor__btn" data-cmd="insertOrderedList" title="Daftar bernomor">1.</button>
+                <button type="button" class="editor__btn" data-cmd="formatBlockH2" title="Sub-judul">H2</button>
+                <button type="button" class="editor__btn" data-cmd="formatBlockQuote" title="Kutipan">&ldquo;</button>
+                <span class="editor__sep"></span>
+                <button type="button" class="editor__btn" data-cmd="removeFormat" title="Hapus format">Tx</button>
+              </div>
+              <div class="editor__area" data-a-body contenteditable="true" data-placeholder="Tulis isi artikel di sini..."></div>
+            </div>
+          </label>
+          <label class="field">
+            <span>Gambar sampul (opsional)</span>
+            <input type="file" accept="image/*" data-a-image>
+            <span class="field-hint" data-a-image-status></span>
           </label>
           <div class="form-actions">
             <button type="submit" class="btn btn--primary" data-a-submit>Tambah artikel</button>
@@ -202,6 +279,11 @@
             <span>Tautan (opsional)</span>
             <input type="url" data-k-link placeholder="https://">
           </label>
+          <label class="field">
+            <span>Gambar (opsional)</span>
+            <input type="file" accept="image/*" data-k-image>
+            <span class="field-hint" data-k-image-status></span>
+          </label>
           <div class="form-actions">
             <button type="submit" class="btn btn--primary" data-k-submit>Tambah karya</button>
             <button type="button" class="btn btn--ghost" data-k-cancel hidden>Batal edit</button>
@@ -214,6 +296,7 @@
   </section>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 </body>
 </html>
