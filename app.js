@@ -50,7 +50,7 @@
   async function uploadImage(file) {
     const ext = file.name.split('.').pop().toLowerCase();
     const path = 'uploads/img_' + Date.now() + '_' + Math.round(Math.random() * 1e9) + '.' + ext;
-    const { error } = await sb.storage.from(BUCKET_NAME).upload(path, file, { upsert: true });
+    const { error } = await sb.storage.from(BUCKET_NAME).upload(path, file);
     if (error) throw new Error(error.message || 'Gagal mengunggah gambar.');
     const { data } = sb.storage.from(BUCKET_NAME).getPublicUrl(path);
     return data.publicUrl;
