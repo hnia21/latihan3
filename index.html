@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hnia21</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <!-- ============ NAV ============ -->
 <header class="topbar">
-  <a href="#/" class="brandmark" data-brandmark data-brandmark-secret>ZH</a>
-  <nav class="toplinks">
+  <a href="#/" class="topbar__brand" data-brandmark data-brandmark-secret>hnia</a>
+  <nav class="topbar__links">
     <a href="#/">Profil</a>
     <a href="#/galeri">Galeri</a>
     <a href="#/artikel">Artikel</a>
@@ -24,28 +24,31 @@
 <!-- ============ VIEW: PUBLIK ============ -->
 <main id="view-public">
 
-  <!-- --- HERO / KARTU IDENTITAS --- -->
-  <section class="id-card" id="hero">
-    <div class="id-card__ticket">
-      <div class="id-card__stamp" data-stamp>ZP</div>
-      <p class="id-card__eyebrow">Kartu identitas digital</p>
-      <h1 class="id-card__name" data-name>Nama Anda</h1>
-      <p class="id-card__role" data-role>Peran / profesi Anda</p>
-      <p class="id-card__bio" data-bio>Tulis bio singkat tentang diri Anda di panel admin.</p>
-      <div class="id-card__meta">
-        <span data-location>Lokasi belum diisi</span>
-        <span class="dot">•</span>
-        <span data-email>email belum diisi</span>
+  <!-- --- HERO --- -->
+  <section class="hero" id="hero">
+    <div class="hero__inner">
+      <div class="hero__text">
+        <p class="hero__eyebrow">Selamat datang di</p>
+        <h1 class="hero__name" data-name>Nama Anda</h1>
+        <p class="hero__role" data-role>Peran / profesi Anda</p>
+        <p class="hero__bio" data-bio>Tulis bio singkat tentang diri Anda di panel admin.</p>
+        <div class="hero__meta">
+          <span data-location>Lokasi belum diisi</span>
+          <span class="hero__sep"></span>
+          <span data-email>email belum diisi</span>
+        </div>
+      </div>
+      <div class="hero__badge">
+        <span class="hero__badge-text" data-stamp>ZP</span>
       </div>
     </div>
-    <div class="id-card__perf" aria-hidden="true"></div>
   </section>
 
   <!-- --- GALERI --- -->
   <section class="section" id="galeri">
-    <div class="section__head">
-      <p class="section__eyebrow">002 — Visual</p>
-      <h2>Galeri</h2>
+    <div class="section__header">
+      <p class="section__eyebrow">Portofolio Visual</p>
+      <h2 class="section__title">Galeri</h2>
     </div>
     <div class="gallery-grid" data-gallery-list>
       <p class="empty-note">Belum ada foto di galeri. Tambahkan lewat panel admin.</p>
@@ -53,10 +56,10 @@
   </section>
 
   <!-- --- ARTIKEL PREVIEW --- -->
-  <section class="section" id="artikel">
-    <div class="section__head">
-      <p class="section__eyebrow">003 — Tulisan</p>
-      <h2>Artikel terbaru</h2>
+  <section class="section section--alt" id="artikel">
+    <div class="section__header">
+      <p class="section__eyebrow">Artikel &amp; Tulisan</p>
+      <h2 class="section__title">Artikel terbaru</h2>
     </div>
     <div class="stub-grid" data-article-list>
       <p class="empty-note">Belum ada artikel. Tambahkan lewat panel admin.</p>
@@ -65,9 +68,9 @@
 
   <!-- --- KARYA PREVIEW --- -->
   <section class="section" id="karya">
-    <div class="section__head">
-      <p class="section__eyebrow">004 — Karya</p>
-      <h2>Karya pilihan</h2>
+    <div class="section__header">
+      <p class="section__eyebrow">Karya &amp; Proyek</p>
+      <h2 class="section__title">Karya pilihan</h2>
     </div>
     <div class="stub-grid" data-karya-list>
       <p class="empty-note">Belum ada karya. Tambahkan lewat panel admin.</p>
@@ -75,20 +78,24 @@
   </section>
 
   <footer class="footer">
-    <div class="footer__brand">
-      <span class="footer__mark" data-footer-mark>ZP</span>
-      <div class="footer__brand-text">
-        <span class="footer__name" data-footer-name>Nama Anda</span>
-        <span class="footer__tagline" data-footer-role>Peran / profesi Anda</span>
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <span class="footer__mark" data-footer-mark>ZP</span>
+        <div class="footer__brand-text">
+          <span class="footer__name" data-footer-name>Nama Anda</span>
+          <span class="footer__tagline" data-footer-role>Peran / profesi Anda</span>
+        </div>
       </div>
+      <nav class="footer__links">
+        <a href="#/">Profil</a>
+        <a href="#/galeri">Galeri</a>
+        <a href="#/artikel">Artikel</a>
+        <a href="#/karya">Karya</a>
+      </nav>
     </div>
-    <nav class="footer__links">
-      <a href="#/">Profil</a>
-      <a href="#/galeri">Galeri</a>
-      <a href="#/artikel">Artikel</a>
-      <a href="#/karya">Karya</a>
-    </nav>
-    <p class="footer__copy">&copy; <span data-footer-year></span> <span data-footer-name-2>Nama Anda</span>. Seluruh hak cipta dilindungi.</p>
+    <div class="footer__bottom">
+      <p>&copy; <span data-footer-year></span> <span data-footer-name-2>Nama Anda</span>. Seluruh hak cipta dilindungi.</p>
+    </div>
   </footer>
 
 </main>
@@ -112,7 +119,7 @@
 <main id="view-login" hidden>
   <section class="auth">
     <div class="auth__card">
-      <p class="auth__eyebrow">005 — Akses admin</p>
+      <p class="auth__eyebrow">Akses admin</p>
       <h1>Masuk</h1>
       <p class="auth__desc">Masukkan kata sandi untuk mengelola konten.</p>
 
@@ -234,17 +241,17 @@
                 <button type="button" class="editor__btn" data-cmd="italic" title="Miring (Ctrl+I)"><i>I</i></button>
                 <button type="button" class="editor__btn" data-cmd="underline" title="Garis bawah (Ctrl+U)"><u>U</u></button>
                 <span class="editor__sep"></span>
-                <button type="button" class="editor__btn" data-cmd="justifyLeft" title="Rata kiri">⯇</button>
-                <button type="button" class="editor__btn" data-cmd="justifyCenter" title="Rata tengah">≡</button>
-                <button type="button" class="editor__btn" data-cmd="justifyRight" title="Rata kanan">⯈</button>
-                <button type="button" class="editor__btn" data-cmd="justifyFull" title="Rata kanan-kiri">☰</button>
+                <button type="button" class="editor__btn" data-cmd="justifyLeft" title="Rata kiri">Left</button>
+                <button type="button" class="editor__btn" data-cmd="justifyCenter" title="Rata tengah">Center</button>
+                <button type="button" class="editor__btn" data-cmd="justifyRight" title="Rata kanan">Right</button>
+                <button type="button" class="editor__btn" data-cmd="justifyFull" title="Rata kanan-kiri">Justify</button>
                 <span class="editor__sep"></span>
-                <button type="button" class="editor__btn" data-cmd="insertUnorderedList" title="Daftar bullet">•—</button>
-                <button type="button" class="editor__btn" data-cmd="insertOrderedList" title="Daftar bernomor">1.</button>
+                <button type="button" class="editor__btn" data-cmd="insertUnorderedList" title="Daftar bullet">List</button>
+                <button type="button" class="editor__btn" data-cmd="insertOrderedList" title="Daftar bernomor">Ordered</button>
                 <button type="button" class="editor__btn" data-cmd="formatBlockH2" title="Sub-judul">H2</button>
-                <button type="button" class="editor__btn" data-cmd="formatBlockQuote" title="Kutipan">&ldquo;</button>
+                <button type="button" class="editor__btn" data-cmd="formatBlockQuote" title="Kutipan">Quote</button>
                 <span class="editor__sep"></span>
-                <button type="button" class="editor__btn" data-cmd="removeFormat" title="Hapus format">Tx</button>
+                <button type="button" class="editor__btn" data-cmd="removeFormat" title="Hapus format">Clear</button>
               </div>
               <div class="editor__area" data-a-body contenteditable="true" data-placeholder="Tulis isi artikel di sini..."></div>
             </div>
