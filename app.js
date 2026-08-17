@@ -56,14 +56,9 @@
     return data.publicUrl;
   }
 
-  async function sbQuery(promise, label) {
-    console.log('[sbQuery] start:', label);
+  async function sbQuery(promise) {
     const { data, error } = await promise;
-    if (error) {
-      console.error('[sbQuery] error:', label, error);
-      throw new Error(error.message || 'Gagal menyimpan data.');
-    }
-    console.log('[sbQuery] ok:', label);
+    if (error) throw new Error(error.message || 'Gagal menyimpan data.');
     return data;
   }
 
@@ -76,22 +71,16 @@
   };
 
   async function refreshPublicData() {
-    console.log('[REFRESH] start');
     const [profileRes, galleryRes, articlesRes, karyaRes] = await Promise.all([
       sb.from('profile').select('*').order('id').limit(1).maybeSingle(),
       sb.from('gallery').select('*').order('created_at', { ascending: false }),
       sb.from('articles').select('*').order('created_at', { ascending: false }),
       sb.from('karya').select('*').order('created_at', { ascending: false })
     ]);
-    console.log('[REFRESH] profile:', profileRes.error ? 'ERR ' + profileRes.error.message : 'ok (' + (profileRes.data ? '1' : '0') + ')');
-    console.log('[REFRESH] gallery:', galleryRes.error ? 'ERR ' + galleryRes.error.message : 'ok (' + (galleryRes.data?.length || 0) + ')');
-    console.log('[REFRESH] articles:', articlesRes.error ? 'ERR ' + articlesRes.error.message : 'ok (' + (articlesRes.data?.length || 0) + ')');
-    console.log('[REFRESH] karya:', karyaRes.error ? 'ERR ' + karyaRes.error.message : 'ok (' + (karyaRes.data?.length || 0) + ')');
     state.profile = profileRes.data;
     state.gallery = galleryRes.data || [];
     state.articles = articlesRes.data || [];
     state.karya = karyaRes.data || [];
-    console.log('[REFRESH] done');
   }
 
   async function checkAuth() {
@@ -404,9 +393,9 @@
         email: fEmail.value.trim()
       };
       if (state.profile && state.profile.id) {
-        state.profile = await sbQuery(sb.from('profile').update(payload).eq('id', state.profile.id).select().single(), 'profile-update');
+        state.profile = await sbQuery(sb.from('profile').update(payload).eq('id', state.profile.id).select().single());
       } else {
-        state.profile = await sbQuery(sb.from('profile').insert(payload).select().single(), 'profile-insert');
+        state.profile = await sbQuery(sb.from('profile').insert(payload).select().single());
       }
       profileSaved.hidden = false;
     } catch (err) {
@@ -434,7 +423,7 @@
         gImageStatus.textContent = 'Mengunggah gambar...';
         imageUrl = await uploadImage(gImage.files[0]);
       }
-      await sbQuery(sb.from('gallery').insert({ title, caption: gCaption.value.trim(), image_url: imageUrl }), 'gallery-insert');
+      await sbQuery(sb.from('gallery').insert({ title, caption: gCaption.value.trim(), image_url: imageUrl }));
       galleryForm.reset();
       gImageStatus.textContent = '';
       await refreshPublicData();
@@ -471,7 +460,7 @@
       btn.addEventListener('click', async () => {
         try {
           const id = btn.closest('.admin-row').dataset.id;
-          await sbQuery(sb.from('gallery').delete().eq('id', id), 'gallery-delete');
+          await sbQuery(sb.from('gallery').delete().eq('id', id));
           await refreshPublicData();
           renderGalleryAdminList();
         } catch (err) { alert(err.message); }
@@ -546,15 +535,12 @@
     e.preventDefault();
     const title = aTitle.value.trim();
     if (!title) return;
-    console.log('[ARTICLE] submit start, title:', title);
     setBusy(aSubmit, true, 'Menyimpan...');
     try {
       let imageUrl = aCurrentImageUrl;
       if (aImage.files && aImage.files[0]) {
         aImageStatus.textContent = 'Mengunggah gambar...';
-        console.log('[ARTICLE] uploading image...');
         imageUrl = await uploadImage(aImage.files[0]);
-        console.log('[ARTICLE] image uploaded:', imageUrl);
       }
       const payload = {
         title,
@@ -563,20 +549,15 @@
         body: sanitizeRichHtml(aBody.innerHTML.trim()),
         image_url: imageUrl
       };
-      console.log('[ARTICLE] payload:', JSON.stringify(payload));
       if (aId.value) {
-        await sbQuery(sb.from('articles').update(payload).eq('id', aId.value), 'articles-update');
+        await sbQuery(sb.from('articles').update(payload).eq('id', aId.value));
       } else {
-        await sbQuery(sb.from('articles').insert(payload), 'articles-insert');
+        await sbQuery(sb.from('articles').insert(payload));
       }
-      console.log('[ARTICLE] saved, refreshing...');
       resetArticleForm();
       await refreshPublicData();
-      console.log('[ARTICLE] data refreshed');
       renderArticleAdminList();
-      console.log('[ARTICLE] DONE');
     } catch (err) {
-      console.error('[ARTICLE] catch:', err);
       alert(err.message);
     } finally {
       setBusy(aSubmit, false);
@@ -628,7 +609,7 @@
       btn.addEventListener('click', async () => {
         try {
           const id = btn.closest('.admin-row').dataset.id;
-          await sbQuery(sb.from('articles').delete().eq('id', id), 'articles-delete');
+          await sbQuery(sb.from('articles').delete().eq('id', id));
           await refreshPublicData();
           renderArticleAdminList();
         } catch (err) { alert(err.message); }
@@ -680,9 +661,9 @@
         image_url: imageUrl
       };
       if (kId.value) {
-        await sbQuery(sb.from('karya').update(payload).eq('id', kId.value), 'karya-update');
+        await sbQuery(sb.from('karya').update(payload).eq('id', kId.value));
       } else {
-        await sbQuery(sb.from('karya').insert(payload), 'karya-insert');
+        await sbQuery(sb.from('karya').insert(payload));
       }
       resetKaryaForm();
       await refreshPublicData();
@@ -739,7 +720,7 @@
       btn.addEventListener('click', async () => {
         try {
           const id = btn.closest('.admin-row').dataset.id;
-          await sbQuery(sb.from('karya').delete().eq('id', id), 'karya-delete');
+          await sbQuery(sb.from('karya').delete().eq('id', id));
           await refreshPublicData();
           renderKaryaAdminList();
         } catch (err) { alert(err.message); }
