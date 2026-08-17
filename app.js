@@ -56,6 +56,12 @@
     return data.publicUrl;
   }
 
+  async function sbQuery(promise) {
+    const { data, error } = await promise;
+    if (error) throw new Error(error.message || 'Gagal menyimpan data.');
+    return data;
+  }
+
   let state = {
     profile: null,
     gallery: [],
@@ -387,11 +393,9 @@
         email: fEmail.value.trim()
       };
       if (state.profile && state.profile.id) {
-        const { data } = await sb.from('profile').update(payload).eq('id', state.profile.id).select().single();
-        state.profile = data;
+        state.profile = await sbQuery(sb.from('profile').update(payload).eq('id', state.profile.id).select().single());
       } else {
-        const { data } = await sb.from('profile').insert(payload).select().single();
-        state.profile = data;
+        state.profile = await sbQuery(sb.from('profile').insert(payload).select().single());
       }
       profileSaved.hidden = false;
     } catch (err) {
@@ -419,7 +423,7 @@
         gImageStatus.textContent = 'Mengunggah gambar...';
         imageUrl = await uploadImage(gImage.files[0]);
       }
-      await sb.from('gallery').insert({ title, caption: gCaption.value.trim(), image_url: imageUrl });
+      await sbQuery(sb.from('gallery').insert({ title, caption: gCaption.value.trim(), image_url: imageUrl }));
       galleryForm.reset();
       gImageStatus.textContent = '';
       await refreshPublicData();
@@ -454,10 +458,12 @@
 
     wrap.querySelectorAll('[data-delete]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const id = btn.closest('.admin-row').dataset.id;
-        await sb.from('gallery').delete().eq('id', id);
-        await refreshPublicData();
-        renderGalleryAdminList();
+        try {
+          const id = btn.closest('.admin-row').dataset.id;
+          await sbQuery(sb.from('gallery').delete().eq('id', id));
+          await refreshPublicData();
+          renderGalleryAdminList();
+        } catch (err) { alert(err.message); }
       });
     });
   }
@@ -544,9 +550,9 @@
         image_url: imageUrl
       };
       if (aId.value) {
-        await sb.from('articles').update(payload).eq('id', aId.value);
+        await sbQuery(sb.from('articles').update(payload).eq('id', aId.value));
       } else {
-        await sb.from('articles').insert(payload);
+        await sbQuery(sb.from('articles').insert(payload));
       }
       resetArticleForm();
       await refreshPublicData();
@@ -601,10 +607,12 @@
     });
     wrap.querySelectorAll('[data-delete]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const id = btn.closest('.admin-row').dataset.id;
-        await sb.from('articles').delete().eq('id', id);
-        await refreshPublicData();
-        renderArticleAdminList();
+        try {
+          const id = btn.closest('.admin-row').dataset.id;
+          await sbQuery(sb.from('articles').delete().eq('id', id));
+          await refreshPublicData();
+          renderArticleAdminList();
+        } catch (err) { alert(err.message); }
       });
     });
   }
@@ -653,9 +661,9 @@
         image_url: imageUrl
       };
       if (kId.value) {
-        await sb.from('karya').update(payload).eq('id', kId.value);
+        await sbQuery(sb.from('karya').update(payload).eq('id', kId.value));
       } else {
-        await sb.from('karya').insert(payload);
+        await sbQuery(sb.from('karya').insert(payload));
       }
       resetKaryaForm();
       await refreshPublicData();
@@ -710,10 +718,12 @@
     });
     wrap.querySelectorAll('[data-delete]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const id = btn.closest('.admin-row').dataset.id;
-        await sb.from('karya').delete().eq('id', id);
-        await refreshPublicData();
-        renderKaryaAdminList();
+        try {
+          const id = btn.closest('.admin-row').dataset.id;
+          await sbQuery(sb.from('karya').delete().eq('id', id));
+          await refreshPublicData();
+          renderKaryaAdminList();
+        } catch (err) { alert(err.message); }
       });
     });
   }
