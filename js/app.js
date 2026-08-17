@@ -91,6 +91,8 @@
 
   const viewPublic = document.getElementById('view-public');
   const viewArticle = document.getElementById('view-article');
+  const viewAllArticles = document.getElementById('view-all-articles');
+  const viewAllKarya = document.getElementById('view-all-karya');
   const viewLogin = document.getElementById('view-login');
   const viewAdmin = document.getElementById('view-admin');
 
@@ -102,6 +104,8 @@
     const route = currentRoute();
     viewPublic.hidden = true;
     viewArticle.hidden = true;
+    viewAllArticles.hidden = true;
+    viewAllKarya.hidden = true;
     viewLogin.hidden = true;
     viewAdmin.hidden = true;
 
@@ -128,6 +132,22 @@
       } else {
         location.hash = '#/';
       }
+    }
+
+    if (route === '/semua-artikel') {
+      await refreshPublicData();
+      renderAllArticles();
+      viewAllArticles.hidden = false;
+      window.scrollTo({ top: 0 });
+      return;
+    }
+
+    if (route === '/semua-karya') {
+      await refreshPublicData();
+      renderAllKarya();
+      viewAllKarya.hidden = false;
+      window.scrollTo({ top: 0 });
+      return;
     }
 
     await refreshPublicData();
@@ -202,11 +222,14 @@
     document.querySelector('[data-location]').textContent = p.location || 'Lokasi belum diisi';
     document.querySelector('[data-email]').textContent = p.email || 'email belum diisi';
 
+    const MAX_ITEMS = 3;
+
     const galleryList = document.querySelector('[data-gallery-list]');
     if (state.gallery.length === 0) {
       galleryList.innerHTML = '<p class="empty-note">Belum ada foto di galeri. Tambahkan lewat panel admin.</p>';
     } else {
-      galleryList.innerHTML = state.gallery.map((g, i) =>
+      var galleryItems = state.gallery.slice(0, MAX_ITEMS);
+      galleryList.innerHTML = galleryItems.map((g, i) =>
         '<div class="gallery-item" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
           (g.image_url
             ? '<img src="' + escapeHtml(g.image_url) + '" alt="' + escapeHtml(g.title) + '" loading="lazy">'
@@ -220,24 +243,30 @@
     if (state.articles.length === 0) {
       articleList.innerHTML = '<p class="empty-note">Belum ada artikel. Tambahkan lewat panel admin.</p>';
     } else {
-      articleList.innerHTML = state.articles.map((a, i) =>
+      var articleItems = state.articles.slice(0, MAX_ITEMS);
+      articleList.innerHTML = articleItems.map((a, i) =>
         '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
           (a.image_url ? '<img class="stub-card__image" src="' + escapeHtml(a.image_url) + '" alt="' + escapeHtml(a.title) + '" loading="lazy">' : '') +
           '<div class="stub-card__content">' +
             '<p class="stub-card__tag">Artikel' + (a.author ? ' &middot; ' + escapeHtml(a.author) : '') + '</p>' +
             '<h3>' + escapeHtml(a.title) + '</h3>' +
             '<p>' + escapeHtml(a.excerpt || stripHtml(a.body).slice(0, 120)) + '</p>' +
-            '<a class="stub-card__link" href="#/artikel/' + a.id + '">Baca selengkapnya</a>' +
+            '<a class="stub-card__link" href="#/artikel/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
           '</div>' +
         '</article>'
       ).join('');
+    }
+    var articleMoreBtn = document.querySelector('[data-article-more]');
+    if (articleMoreBtn) {
+      articleMoreBtn.style.display = state.articles.length > MAX_ITEMS ? '' : 'none';
     }
 
     const karyaList = document.querySelector('[data-karya-list]');
     if (state.karya.length === 0) {
       karyaList.innerHTML = '<p class="empty-note">Belum ada karya. Tambahkan lewat panel admin.</p>';
     } else {
-      karyaList.innerHTML = state.karya.map((k, i) =>
+      var karyaItems = state.karya.slice(0, MAX_ITEMS);
+      karyaList.innerHTML = karyaItems.map((k, i) =>
         '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
           (k.image_url ? '<img class="stub-card__image" src="' + escapeHtml(k.image_url) + '" alt="' + escapeHtml(k.title) + '" loading="lazy">' : '') +
           '<div class="stub-card__content">' +
@@ -249,6 +278,52 @@
         '</article>'
       ).join('');
     }
+    var karyaMoreBtn = document.querySelector('[data-karya-more]');
+    if (karyaMoreBtn) {
+      karyaMoreBtn.style.display = state.karya.length > MAX_ITEMS ? '' : 'none';
+    }
+  }
+
+  function renderAllArticles() {
+    const wrap = document.querySelector('[data-all-articles-list]');
+    if (!wrap) return;
+    if (state.articles.length === 0) {
+      wrap.innerHTML = '<p class="empty-note">Belum ada artikel.</p>';
+      return;
+    }
+    wrap.innerHTML = state.articles.map((a, i) =>
+      '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
+        (a.image_url ? '<img class="stub-card__image" src="' + escapeHtml(a.image_url) + '" alt="' + escapeHtml(a.title) + '" loading="lazy">' : '') +
+        '<div class="stub-card__content">' +
+          '<p class="stub-card__tag">Artikel' + (a.author ? ' &middot; ' + escapeHtml(a.author) : '') + '</p>' +
+          '<h3>' + escapeHtml(a.title) + '</h3>' +
+          '<p>' + escapeHtml(a.excerpt || stripHtml(a.body).slice(0, 120)) + '</p>' +
+          '<a class="stub-card__link" href="#/artikel/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
+        '</div>' +
+      '</article>'
+    ).join('');
+    setupReveal();
+  }
+
+  function renderAllKarya() {
+    const wrap = document.querySelector('[data-all-karya-list]');
+    if (!wrap) return;
+    if (state.karya.length === 0) {
+      wrap.innerHTML = '<p class="empty-note">Belum ada karya.</p>';
+      return;
+    }
+    wrap.innerHTML = state.karya.map((k, i) =>
+      '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
+        (k.image_url ? '<img class="stub-card__image" src="' + escapeHtml(k.image_url) + '" alt="' + escapeHtml(k.title) + '" loading="lazy">' : '') +
+        '<div class="stub-card__content">' +
+          '<p class="stub-card__tag">' + escapeHtml(k.category || 'Karya') + '</p>' +
+          '<h3>' + escapeHtml(k.title) + '</h3>' +
+          '<p>' + escapeHtml(k.description || '') + '</p>' +
+          (k.link ? '<a class="stub-card__link" href="' + escapeHtml(k.link) + '" target="_blank" rel="noopener">Lihat karya</a>' : '') +
+        '</div>' +
+      '</article>'
+    ).join('');
+    setupReveal();
   }
 
   function renderArticleDetail(article) {

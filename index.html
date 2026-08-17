@@ -69,6 +69,9 @@
     <div class="stub-grid" data-article-list>
       <p class="empty-note">Belum ada artikel. Tambahkan lewat panel admin.</p>
     </div>
+    <div class="section__more">
+      <a href="#/semua-artikel" class="btn btn--outline" data-article-more>Lihat Semua Artikel</a>
+    </div>
   </section>
 
   <!-- --- KARYA PREVIEW --- -->
@@ -79,6 +82,9 @@
     </div>
     <div class="stub-grid" data-karya-list>
       <p class="empty-note">Belum ada karya. Tambahkan lewat panel admin.</p>
+    </div>
+    <div class="section__more">
+      <a href="#/semua-karya" class="btn btn--outline" data-karya-more>Lihat Semua Karya</a>
     </div>
   </section>
 
@@ -103,6 +109,30 @@
     </div>
   </footer>
 
+</main>
+
+<!-- ============ VIEW: SEMUA ARTIKEL ============ -->
+<main id="view-all-articles" hidden>
+  <section class="section">
+    <div class="section__header">
+      <a href="#/" class="back-link">&larr; Kembali</a>
+      <p class="section__eyebrow">Artikel &amp; Tulisan</p>
+      <h2 class="section__title">Semua Artikel</h2>
+    </div>
+    <div class="stub-grid" data-all-articles-list></div>
+  </section>
+</main>
+
+<!-- ============ VIEW: SEMUA KARYA ============ -->
+<main id="view-all-karya" hidden>
+  <section class="section">
+    <div class="section__header">
+      <a href="#/" class="back-link">&larr; Kembali</a>
+      <p class="section__eyebrow">Karya &amp; Proyek</p>
+      <h2 class="section__title">Semua Karya</h2>
+    </div>
+    <div class="stub-grid" data-all-karya-list></div>
+  </section>
 </main>
 
 <!-- ============ VIEW: DETAIL ARTIKEL ============ -->

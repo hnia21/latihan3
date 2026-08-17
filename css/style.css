@@ -351,6 +351,48 @@ a { color: inherit; text-decoration: none; }
   padding: 20px 0;
 }
 
+/* ============ SECTION MORE BUTTON ============ */
+.section__more {
+  margin-top: 28px;
+  text-align: center;
+}
+.btn--outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease), transform 0.15s var(--ease);
+}
+.btn--outline:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.btn--outline:active { transform: scale(0.97); }
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  margin-bottom: 24px;
+  transition: color var(--dur) var(--ease), gap var(--dur) var(--ease);
+}
+.back-link:hover { color: var(--accent); gap: 10px; }
+
 /* ============ FOOTER ============ */
 .footer {
   background: var(--ink);
