@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Branding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="topbar">
+  <a href="#/" class="brandmark" data-brandmark>ZP</a>
+  <nav class="toplinks">
+    <a href="#/">Profil</a>
+    <a href="#/artikel">Artikel</a>
+    <a href="#/karya">Karya</a>
+  </nav>
+</header>
+
+<!-- ============ VIEW: PUBLIK ============ -->
+<main id="view-public">
+
+  <!-- --- HERO / KARTU IDENTITAS --- -->
+  <section class="id-card" id="hero">
+    <div class="id-card__ticket">
+      <div class="id-card__stamp" data-stamp>ZP</div>
+      <p class="id-card__eyebrow">Kartu identitas digital</p>
+      <h1 class="id-card__name" data-name>Nama Anda</h1>
+      <p class="id-card__role" data-role>Peran / profesi Anda</p>
+      <p class="id-card__bio" data-bio>Tulis bio singkat tentang diri Anda di panel admin.</p>
+      <div class="id-card__meta">
+        <span data-location>Lokasi belum diisi</span>
+        <span class="dot">•</span>
+        <span data-email>email belum diisi</span>
+      </div>
+    </div>
+    <div class="id-card__perf" aria-hidden="true"></div>
+  </section>
+
+  <!-- --- ARTIKEL PREVIEW --- -->
+  <section class="section" id="artikel">
+    <div class="section__head">
+      <p class="section__eyebrow">002 — Tulisan</p>
+      <h2>Artikel terbaru</h2>
+    </div>
+    <div class="stub-grid" data-article-list>
+      <p class="empty-note">Belum ada artikel. Tambahkan lewat panel admin.</p>
+    </div>
+  </section>
+
+  <!-- --- KARYA PREVIEW --- -->
+  <section class="section" id="karya">
+    <div class="section__head">
+      <p class="section__eyebrow">003 — Karya</p>
+      <h2>Karya pilihan</h2>
+    </div>
+    <div class="stub-grid" data-karya-list>
+      <p class="empty-note">Belum ada karya. Tambahkan lewat panel admin.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span data-footer-name>Nama Anda</span>
+    <a href="#/admin" class="footer__admin-link">Masuk sebagai admin</a>
+  </footer>
+
+</main>
+
+<!-- ============ VIEW: DETAIL ARTIKEL ============ -->
+<main id="view-article" hidden>
+  <article class="article-detail">
+    <a href="#/" class="article-detail__back">&larr; Kembali</a>
+    <p class="article-detail__eyebrow">Artikel</p>
+    <h1 data-ad-title>Judul artikel</h1>
+    <p class="article-detail__date" data-ad-date></p>
+    <div class="article-detail__body" data-ad-body></div>
+  </article>
+</main>
+
+<!-- ============ VIEW: LOGIN ADMIN ============ -->
+<main id="view-login" hidden>
+  <section class="auth">
+    <div class="auth__card">
+      <p class="auth__eyebrow" data-auth-eyebrow>004 — Akses admin</p>
+      <h1 data-auth-title>Masuk</h1>
+      <p class="auth__desc" data-auth-desc>Masukkan kata sandi untuk mengelola konten.</p>
+
+      <form data-login-form>
+        <label class="field">
+          <span>Kata sandi</span>
+          <input type="password" data-password-input autocomplete="current-password" required>
+        </label>
+        <label class="field" data-confirm-field hidden>
+          <span>Ulangi kata sandi</span>
+          <input type="password" data-confirm-input autocomplete="new-password">
+        </label>
+        <p class="field-error" data-login-error hidden></p>
+        <button type="submit" class="btn btn--primary" data-login-submit>Masuk</button>
+      </form>
+
+      <a href="#/" class="auth__back">Kembali ke situs</a>
+    </div>
+  </section>
+</main>
+
+<!-- ============ VIEW: ADMIN PANEL ============ -->
+<main id="view-admin" hidden>
+  <section class="admin">
+    <aside class="admin__side">
+      <p class="admin__eyebrow">Panel admin</p>
+      <nav class="admin__nav">
+        <button data-tab="profil" class="admin__tab is-active">Profil</button>
+        <button data-tab="artikel" class="admin__tab">Artikel</button>
+        <button data-tab="karya" class="admin__tab">Karya</button>
+      </nav>
+      <button class="btn btn--ghost admin__logout" data-logout>Keluar</button>
+    </aside>
+
+    <div class="admin__body">
+
+      <!-- TAB: PROFIL -->
+      <div class="admin__panel is-active" data-panel="profil">
+        <h2>Profil</h2>
+        <form data-profile-form class="stack">
+          <label class="field">
+            <span>Inisial (untuk lencana)</span>
+            <input type="text" data-f-initials maxlength="3">
+          </label>
+          <label class="field">
+            <span>Nama lengkap</span>
+            <input type="text" data-f-name required>
+          </label>
+          <label class="field">
+            <span>Peran / profesi</span>
+            <input type="text" data-f-role placeholder="misal: Desainer Produk">
+          </label>
+          <label class="field">
+            <span>Bio singkat</span>
+            <textarea data-f-bio rows="4"></textarea>
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span>Lokasi</span>
+              <input type="text" data-f-location placeholder="misal: Malang, Indonesia">
+            </label>
+            <label class="field">
+              <span>Email</span>
+              <input type="email" data-f-email placeholder="nama@email.com">
+            </label>
+          </div>
+          <button type="submit" class="btn btn--primary">Simpan profil</button>
+          <p class="save-note" data-profile-saved hidden>Profil disimpan.</p>
+        </form>
+      </div>
+
+      <!-- TAB: ARTIKEL -->
+      <div class="admin__panel" data-panel="artikel">
+        <h2>Artikel</h2>
+        <form data-article-form class="stack">
+          <input type="hidden" data-a-id>
+          <label class="field">
+            <span>Judul</span>
+            <input type="text" data-a-title required>
+          </label>
+          <label class="field">
+            <span>Ringkasan</span>
+            <textarea data-a-excerpt rows="3"></textarea>
+          </label>
+          <label class="field">
+            <span>Isi artikel</span>
+            <textarea data-a-body rows="6"></textarea>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn--primary" data-a-submit>Tambah artikel</button>
+            <button type="button" class="btn btn--ghost" data-a-cancel hidden>Batal edit</button>
+          </div>
+        </form>
+        <div class="admin-list" data-article-admin-list></div>
+      </div>
+
+      <!-- TAB: KARYA -->
+      <div class="admin__panel" data-panel="karya">
+        <h2>Karya</h2>
+        <form data-karya-form class="stack">
+          <input type="hidden" data-k-id>
+          <label class="field">
+            <span>Judul karya</span>
+            <input type="text" data-k-title required>
+          </label>
+          <label class="field">
+            <span>Kategori</span>
+            <input type="text" data-k-category placeholder="misal: Ilustrasi, Web, Fotografi">
+          </label>
+          <label class="field">
+            <span>Deskripsi</span>
+            <textarea data-k-desc rows="3"></textarea>
+          </label>
+          <label class="field">
+            <span>Tautan (opsional)</span>
+            <input type="url" data-k-link placeholder="https://">
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn--primary" data-k-submit>Tambah karya</button>
+            <button type="button" class="btn btn--ghost" data-k-cancel hidden>Batal edit</button>
+          </div>
+        </form>
+        <div class="admin-list" data-karya-admin-list></div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
