@@ -276,6 +276,7 @@
   }
 
   const loginForm = document.querySelector('[data-login-form]');
+  const emailInput = document.querySelector('[data-email-input]');
   const passwordInput = document.querySelector('[data-password-input]');
   const loginError = document.querySelector('[data-login-error]');
   const loginSubmit = document.querySelector('[data-login-submit]');
@@ -298,7 +299,7 @@
 
     try {
       const { error } = await sb.auth.signInWithPassword({
-        email: 'admin@hnia.my.id',
+        email: emailInput.value.trim(),
         password: pw
       });
       if (error) {
