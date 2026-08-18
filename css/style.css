@@ -264,13 +264,12 @@ a { color: inherit; text-decoration: none; }
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  background: var(--paper);
-  clip-path: circle(0% at var(--tx, 50%) var(--ty, 50%));
-  animation: themeRipple 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 1;
+  animation: themeFadeOut 0.35s 0.05s ease forwards;
 }
-@keyframes themeRipple {
-  0%   { clip-path: circle(0% at var(--tx) var(--ty)); }
-  100% { clip-path: circle(150% at var(--tx) var(--ty)); }
+@keyframes themeFadeOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* ============ HERO ============ */

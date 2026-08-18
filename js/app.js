@@ -357,26 +357,18 @@
   document.documentElement.setAttribute('data-theme', savedTheme);
   const themeBtn = document.querySelector('[data-theme-toggle]');
   if (themeBtn) {
-    themeBtn.addEventListener('click', (e) => {
+    themeBtn.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
-      const rect = themeBtn.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
+      const nextBg = next === 'dark' ? '#0f172a' : '#f8fafc';
 
       const overlay = document.createElement('div');
       overlay.className = 'theme-transition-overlay';
-      overlay.style.setProperty('--tx', cx + 'px');
-      overlay.style.setProperty('--ty', cy + 'px');
-      overlay.style.background = next === 'dark' ? '#0f172a' : '#f8fafc';
+      overlay.style.background = nextBg;
       document.body.appendChild(overlay);
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          document.documentElement.setAttribute('data-theme', next);
-          localStorage.setItem('_theme', next);
-        });
-      });
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('_theme', next);
 
       overlay.addEventListener('animationend', () => { overlay.remove(); });
     });
