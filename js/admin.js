@@ -180,25 +180,30 @@
 
   // ── categories (supabase) ──────────────────────────────────────
   let stateCategories = [];
+  let catTableReady = false;
 
   async function refreshCategories() {
     const { data, error } = await sb.from('article_categories').select('*').order('name');
-    if (!error) stateCategories = data || [];
+    if (!error) { stateCategories = data || []; catTableReady = true; }
+    else { catTableReady = false; stateCategories = []; }
   }
 
   async function addCategory(name) {
+    if (!catTableReady) throw new Error('Tabel belum tersedia. Jalankan SQL di Supabase SQL Editor.');
     const { error } = await sb.from('article_categories').insert({ name });
     if (error) throw new Error(error.message);
     await refreshCategories();
   }
 
   async function updateCategory(id, name) {
+    if (!catTableReady) throw new Error('Tabel belum tersedia.');
     const { error } = await sb.from('article_categories').update({ name }).eq('id', id);
     if (error) throw new Error(error.message);
     await refreshCategories();
   }
 
   async function deleteCategory(id) {
+    if (!catTableReady) throw new Error('Tabel belum tersedia.');
     const { error } = await sb.from('article_categories').delete().eq('id', id);
     if (error) throw new Error(error.message);
     await refreshCategories();
@@ -212,7 +217,8 @@
   }
 
   function renderCatList(listEl) {
-    if (stateCategories.length === 0) { listEl.innerHTML = '<p class="empty-note">Belum ada kategori.</p>'; return; }
+    if (!catTableReady) { listEl.innerHTML = '<p class="empty-note" style="color:var(--danger)">Tabel article_categories belum ada. Jalankan SQL berikut di Supabase SQL Editor:<br><code style="font-size:12px;display:block;margin-top:6px;padding:8px;background:var(--paper-alt);border-radius:4px;white-space:pre-wrap">CREATE TABLE article_categories (\n  id bigserial PRIMARY KEY,\n  name text NOT NULL UNIQUE,\n  created_at timestamptz DEFAULT now()\n);</code></p>'; return; }
+    if (stateCategories.length === 0) { listEl.innerHTML = '<p class="empty-note">Belum ada kategori. Tambahkan di bawah.</p>'; return; }
     listEl.innerHTML = stateCategories.map(c =>
       '<div class="cat-row" data-id="' + c.id + '">' +
         '<span>' + escapeHtml(c.name) + '</span>' +
