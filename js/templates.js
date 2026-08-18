@@ -24,7 +24,10 @@ window.VIEWS = {
       <p class="section__eyebrow">Portofolio Visual</p>
       <h2 class="section__title">Galeri</h2>
     </div>
-    <div class="gallery-grid" data-gallery-list></div>
+    <div class="slideshow" data-slideshow>
+      <div class="slideshow__track" data-slideshow-track></div>
+      <div class="slideshow__dots" data-slideshow-dots></div>
+    </div>
     <div class="section__more">
       <a href="#/semua-galeri" class="btn btn--outline" data-gallery-more>Lihat Semua Galeri</a>
     </div>
