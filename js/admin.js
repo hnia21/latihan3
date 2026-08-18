@@ -271,7 +271,6 @@
     const catList = $(viewAdmin, '[data-cat-list]');
     const catInput = $(viewAdmin, '[data-cat-input]');
     $(viewAdmin, '[data-cat-manage]')?.addEventListener('click', async () => { catManager.hidden = !catManager.hidden; if (!catManager.hidden) { await refreshCategories(); renderCatList(catList); } });
-    $(viewAdmin, '[data-cat-close]')?.addEventListener('click', () => { catManager.hidden = true; });
     $(viewAdmin, '[data-cat-add]')?.addEventListener('click', async () => {
       const v = catInput.value.trim(); if (!v) return;
       if (stateCategories.some(c => c.name === v)) { alert('Kategori sudah ada.'); return; }
