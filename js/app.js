@@ -358,19 +358,9 @@
   const themeBtn = document.querySelector('[data-theme-toggle]');
   if (themeBtn) {
     themeBtn.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'dark' ? 'light' : 'dark';
-      const nextBg = next === 'dark' ? '#0f172a' : '#f8fafc';
-
-      const overlay = document.createElement('div');
-      overlay.className = 'theme-transition-overlay';
-      overlay.style.background = nextBg;
-      document.body.appendChild(overlay);
-
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('_theme', next);
-
-      overlay.addEventListener('animationend', () => { overlay.remove(); });
     });
   }
 

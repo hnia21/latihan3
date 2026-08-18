@@ -258,18 +258,19 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-muted);
 }
 
-/* ============ THEME TRANSITION ============ */
-.theme-transition-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 1;
-  animation: themeFadeOut 0.35s 0.05s ease forwards;
-}
-@keyframes themeFadeOut {
-  0%   { opacity: 1; }
-  100% { opacity: 0; }
+/* ============ THEME TRANSITION (morph) ============ */
+body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
+.hero, .hero__name, .hero__role, .hero__bio, .hero__eyebrow, .hero__meta, .hero__sep, .hero__badge, .hero__badge-text,
+.section, .section--alt, .section__title, .section__eyebrow,
+.stub-card, .stub-card h3, .stub-card p, .stub-card__meta,
+.gallery-item, .gallery-item__caption,
+.footer, .footer__brand, .footer__links a, .footer__bottom,
+.search-overlay__inner, .search-overlay__input, .search-result, .search-no-result,
+.field input, .field textarea,
+.card, .card h3, .card p,
+.modal, .modal__inner,
+.alert, .empty {
+  transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
 }
 
 /* ============ HERO ============ */
