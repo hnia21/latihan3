@@ -352,4 +352,66 @@
       if (logoClicks >= 5) { logoClicks = 0; location.href = 'admin.html'; }
     });
   }
+
+  const savedTheme = localStorage.getItem('_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  const themeBtn = document.querySelector('[data-theme-toggle]');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('_theme', next);
+    });
+  }
+
+  const searchOverlay = document.querySelector('[data-search-overlay]');
+  const searchInput = document.querySelector('[data-global-search]');
+  const searchResults = document.querySelector('[data-global-results]');
+  document.querySelector('[data-search-open]')?.addEventListener('click', () => {
+    searchOverlay.hidden = false;
+    setTimeout(() => searchInput.focus(), 100);
+  });
+  document.querySelector('[data-search-close]')?.addEventListener('click', () => {
+    searchOverlay.hidden = true;
+    searchInput.value = '';
+    searchResults.innerHTML = '';
+  });
+  searchOverlay?.addEventListener('click', (e) => {
+    if (e.target === searchOverlay) { searchOverlay.hidden = true; searchInput.value = ''; searchResults.innerHTML = ''; }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && searchOverlay && !searchOverlay.hidden) {
+      searchOverlay.hidden = true; searchInput.value = ''; searchResults.innerHTML = '';
+    }
+  });
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.toLowerCase().trim();
+      if (!q) { searchResults.innerHTML = ''; return; }
+      let html = '';
+      state.articles.filter(a => (a.title || '').toLowerCase().includes(q) || (a.author || '').toLowerCase().includes(q)).forEach(a => {
+        html += '<a class="search-result" href="#/artikel/' + a.id + '" data-search-close-result>' +
+          '<div class="search-result__type">Artikel</div>' +
+          '<div class="search-result__title">' + escapeHtml(a.title) + '</div>' +
+          (a.author ? '<div class="search-result__meta">' + escapeHtml(a.author) + '</div>' : '') + '</a>';
+      });
+      state.karya.filter(k => (k.title || '').toLowerCase().includes(q) || (k.category || '').toLowerCase().includes(q)).forEach(k => {
+        html += '<a class="search-result" href="#/semua-karya" data-search-close-result>' +
+          '<div class="search-result__type">Karya</div>' +
+          '<div class="search-result__title">' + escapeHtml(k.title) + '</div>' +
+          (k.category ? '<div class="search-result__meta">' + escapeHtml(k.category) + '</div>' : '') + '</a>';
+      });
+      state.gallery.filter(g => (g.title || '').toLowerCase().includes(q) || (g.caption || '').toLowerCase().includes(q)).forEach(g => {
+        html += '<a class="search-result" href="#/semua-galeri" data-search-close-result>' +
+          '<div class="search-result__type">Galeri</div>' +
+          '<div class="search-result__title">' + escapeHtml(g.title) + '</div>' +
+          (g.caption ? '<div class="search-result__meta">' + escapeHtml(g.caption) + '</div>' : '') + '</a>';
+      });
+      searchResults.innerHTML = html || '<div class="search-no-result">Tidak ada hasil ditemukan.</div>';
+      searchResults.querySelectorAll('[data-search-close-result]').forEach(el => {
+        el.addEventListener('click', () => { searchOverlay.hidden = true; searchInput.value = ''; searchResults.innerHTML = ''; });
+      });
+    });
+  }
 })();
