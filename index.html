@@ -17,7 +17,10 @@
   <nav class="topbar__links">
     <a href="#/">Home</a>
     <a href="#/semua-galeri">Galeri</a>
-    <a href="#/semua-artikel">Artikel</a>
+    <div class="topbar__dropdown" data-artikel-dropdown>
+      <a href="#/semua-artikel" class="topbar__dropdown-trigger">Artikel <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></a>
+      <div class="topbar__dropdown-menu" data-artikel-dropdown-menu></div>
+    </div>
     <a href="#/semua-karya">Karya</a>
   </nav>
   <div class="topbar__actions">

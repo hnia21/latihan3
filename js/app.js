@@ -32,19 +32,22 @@
     return d.innerHTML;
   }
 
-  let state = { profile: null, gallery: [], articles: [], karya: [] };
+  let state = { profile: null, gallery: [], articles: [], karya: [], categories: [] };
 
   async function refreshPublicData() {
-    const [p, g, a, k] = await Promise.all([
+    const [p, g, a, k, c] = await Promise.all([
       sb.from('profile').select('*').order('id').limit(1).maybeSingle(),
       sb.from('gallery').select('*').order('created_at', { ascending: false }),
       sb.from('articles').select('*').order('created_at', { ascending: false }),
-      sb.from('karya').select('*').order('created_at', { ascending: false })
+      sb.from('karya').select('*').order('created_at', { ascending: false }),
+      sb.from('article_categories').select('*').order('name')
     ]);
     state.profile = p.data;
     state.gallery = g.data || [];
     state.articles = a.data || [];
     state.karya = k.data || [];
+    state.categories = c.data || [];
+    buildArtikelDropdown();
   }
 
   const viewPublic      = document.getElementById('view-public');
@@ -217,15 +220,17 @@
     setupReveal(viewAllGallery);
   }
 
-  function renderAllArticles(query) {
+  function renderAllArticles(query, category) {
     viewAllArticles.innerHTML = VIEWS.allArticles();
     const wrap = $(viewAllArticles, '[data-all-articles-list]');
     const q = (query || '').toLowerCase();
-    const filtered = q ? state.articles.filter(a =>
+    let filtered = state.articles;
+    if (category) filtered = filtered.filter(a => (a.category || '').toLowerCase() === category.toLowerCase());
+    if (q) filtered = filtered.filter(a =>
       (a.title || '').toLowerCase().includes(q) || (a.author || '').toLowerCase().includes(q)
-    ) : state.articles;
+    );
     if (filtered.length === 0) {
-      wrap.innerHTML = '<p class="empty-note">' + (q ? 'Tidak ada artikel yang cocok.' : 'Belum ada artikel.') + '</p>';
+      wrap.innerHTML = '<p class="empty-note">' + (q || category ? 'Tidak ada artikel yang cocok.' : 'Belum ada artikel.') + '</p>';
     } else {
       wrap.innerHTML = filtered.map((a, i) =>
         '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
@@ -241,7 +246,7 @@
     const input = $(viewAllArticles, '[data-search-artikel]');
     if (input) {
       input.value = query || '';
-      input.addEventListener('input', () => { renderAllArticles(input.value); });
+      input.addEventListener('input', () => { renderAllArticles(input.value, category); });
       input.focus();
     }
     fillFooter(viewAllArticles);
@@ -308,6 +313,18 @@
     targets.forEach(el => obs.observe(el));
   }
 
+  function buildArtikelDropdown() {
+    const menu = document.querySelector('[data-artikel-dropdown-menu]');
+    if (!menu) return;
+    const route = currentRoute();
+    let html = '<a href="#/semua-artikel">Semua Artikel</a>';
+    state.categories.forEach(c => {
+      const active = route === '/kategori/' + encodeURIComponent(c.name) ? ' is-active' : '';
+      html += '<a href="#/kategori/' + encodeURIComponent(c.name) + '"' + active + '>' + escapeHtml(c.name) + '</a>';
+    });
+    menu.innerHTML = html;
+  }
+
   function currentRoute() { return (location.hash || '#/').replace(/^#/, '') || '/'; }
 
   async function router() {
@@ -327,11 +344,16 @@
     if (route === '/semua-artikel') {
       await refreshPublicData(); renderAllArticles(); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
     }
+    const catMatch = route.match(/^\/kategori\/(.+)$/);
+    if (catMatch) {
+      const catName = decodeURIComponent(catMatch[1]);
+      await refreshPublicData(); renderAllArticles('', catName); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
+    }
     if (route === '/semua-karya') {
       await refreshPublicData(); renderAllKarya(); viewAllKarya.hidden = false; window.scrollTo({ top: 0 }); return;
     }
 
-    await refreshPublicData(); renderPublic(); viewPublic.hidden = false;
+    await refreshPublicData(); renderPublic(); viewPublic.hidden = false; buildArtikelDropdown();
 
     if (route === '/artikel') $(viewPublic, '#artikel')?.scrollIntoView({ behavior: 'smooth' });
     else if (route === '/karya') $(viewPublic, '#karya')?.scrollIntoView({ behavior: 'smooth' });
