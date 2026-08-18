@@ -1,7 +1,6 @@
 (() => {
   'use strict';
 
-  const ADMIN_EMAIL = 'admin@hnia.my.id';
   const MAX_ATTEMPTS = 5;
   const LOCKOUT_MS = 15 * 60 * 1000;
 
@@ -46,7 +45,10 @@
     const err   = APP.$(viewLogin, '[data-login-error]');
     const btn   = APP.$(viewLogin, '[data-login-submit]');
 
-    email.value = ADMIN_EMAIL;
+    email.value = '';
+    APP.sb.from('profile').select('email').order('id').limit(1).maybeSingle().then(({ data }) => {
+      if (data && data.email) email.value = data.email;
+    });
 
     function updateLockUI() {
       if (isLocked()) {

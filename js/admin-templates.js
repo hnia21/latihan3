@@ -8,7 +8,7 @@ window.ADMIN_VIEWS = {
       <form data-login-form>
         <label class="field">
           <span>Email</span>
-          <input type="email" data-email-input placeholder="email@contoh.com" autocomplete="email" required>
+          <input type="email" data-email-input placeholder="email@contoh.com" autocomplete="off" required>
         </label>
         <label class="field">
           <span>Kata sandi</span>
