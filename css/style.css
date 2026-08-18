@@ -1330,8 +1330,18 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
   .topbar__links { gap: 20px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
   .topbar__links::-webkit-scrollbar { display: none; }
   .topbar__links a { white-space: nowrap; font-size: 13px; }
-  .topbar__dropdown-menu { min-width: 170px; left: 0; transform: translateX(0) translateY(4px); }
-  .topbar__dropdown:hover .topbar__dropdown-menu { transform: translateX(0) translateY(0); }
+  .topbar__dropdown-menu {
+    position: fixed;
+    top: 52px;
+    left: 16px;
+    right: auto;
+    min-width: 180px;
+    max-width: 60vw;
+    transform: none;
+    z-index: 200;
+  }
+  .topbar__dropdown.is-open .topbar__dropdown-menu { transform: none; }
+  .topbar__dropdown:hover .topbar__dropdown-menu { transform: none; }
   .search-overlay { padding-top: 70px; }
 
   .hero__inner { flex-direction: column-reverse; text-align: center; padding: 40px 16px 48px; gap: 32px; }
