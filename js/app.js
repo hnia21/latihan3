@@ -164,7 +164,7 @@
             '<p class="stub-card__tag">Artikel' + (a.author ? ' &middot; ' + escapeHtml(a.author) : '') + '</p>' +
             '<h3>' + escapeHtml(a.title) + '</h3>' +
             '<p>' + escapeHtml(a.excerpt || stripHtml(a.body).slice(0, 120)) + '</p>' +
-            '<a class="stub-card__link" href="#/artikel/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
+            '<a class="stub-card__link" href="/artikel/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
           '</div></article>'
       ).join('');
     }
@@ -239,7 +239,7 @@
             '<p class="stub-card__tag">Artikel' + (a.author ? ' &middot; ' + escapeHtml(a.author) : '') + '</p>' +
             '<h3>' + escapeHtml(a.title) + '</h3>' +
             '<p>' + escapeHtml(a.excerpt || stripHtml(a.body).slice(0, 120)) + '</p>' +
-            '<a class="stub-card__link" href="#/artikel/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
+            '<a class="stub-card__link" href="/artikel/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
           '</div></article>'
       ).join('');
     }
@@ -317,10 +317,10 @@
     const menu = document.querySelector('[data-artikel-dropdown-menu]');
     if (!menu) return;
     const route = currentRoute();
-    let html = '<a href="#/semua-artikel">Semua Artikel</a>';
+    let html = '<a href="/semua-artikel">Semua Artikel</a>';
     state.categories.forEach(c => {
       const active = route === '/kategori/' + encodeURIComponent(c.name) ? ' is-active' : '';
-      html += '<a href="#/kategori/' + encodeURIComponent(c.name) + '"' + active + '>' + escapeHtml(c.name) + '</a>';
+      html += '<a href="/kategori/' + encodeURIComponent(c.name) + '"' + active + '>' + escapeHtml(c.name) + '</a>';
     });
     menu.innerHTML = html;
   }
@@ -341,7 +341,17 @@
     });
   }
 
-  function currentRoute() { return (location.hash || '#/').replace(/^#/, '') || '/'; }
+  function currentRoute() {
+    const p = location.pathname;
+    const r = new URLSearchParams(location.search).get('r');
+    if (r && r !== '/') { history.replaceState(null, '', r + location.hash); return r; }
+    return p === '/' ? '/' : p;
+  }
+
+  function navigateTo(path) {
+    history.pushState(null, '', path);
+    router();
+  }
 
   async function router() {
     const route = currentRoute();
@@ -351,7 +361,7 @@
     if (artMatch) {
       const { data } = await sb.from('articles').select('*').eq('id', artMatch[1]).single();
       if (data) { renderArticleDetail(data); viewArticle.hidden = false; window.scrollTo({ top: 0 }); return; }
-      else { location.hash = '#/'; }
+      else { navigateTo('/'); }
     }
 
     if (route === '/semua-galeri') {
@@ -375,7 +385,16 @@
     else if (route === '/karya') $(viewPublic, '#karya')?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  window.addEventListener('hashchange', router);
+  window.addEventListener('popstate', router);
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
+    if (a.hasAttribute('target') && a.target !== '_self') return;
+    e.preventDefault();
+    navigateTo(href);
+  });
   router();
 
   let logoClicks = 0;
@@ -428,19 +447,19 @@
       if (!q) { searchResults.innerHTML = ''; return; }
       let html = '';
       state.articles.filter(a => (a.title || '').toLowerCase().includes(q) || (a.author || '').toLowerCase().includes(q)).forEach(a => {
-        html += '<a class="search-result" href="#/artikel/' + a.id + '" data-search-close-result>' +
+        html += '<a class="search-result" href="/artikel/' + a.id + '" data-search-close-result>' +
           '<div class="search-result__type">Artikel</div>' +
           '<div class="search-result__title">' + escapeHtml(a.title) + '</div>' +
           (a.author ? '<div class="search-result__meta">' + escapeHtml(a.author) + '</div>' : '') + '</a>';
       });
       state.karya.filter(k => (k.title || '').toLowerCase().includes(q) || (k.category || '').toLowerCase().includes(q)).forEach(k => {
-        html += '<a class="search-result" href="#/semua-karya" data-search-close-result>' +
+        html += '<a class="search-result" href="/semua-karya" data-search-close-result>' +
           '<div class="search-result__type">Karya</div>' +
           '<div class="search-result__title">' + escapeHtml(k.title) + '</div>' +
           (k.category ? '<div class="search-result__meta">' + escapeHtml(k.category) + '</div>' : '') + '</a>';
       });
       state.gallery.filter(g => (g.title || '').toLowerCase().includes(q) || (g.caption || '').toLowerCase().includes(q)).forEach(g => {
-        html += '<a class="search-result" href="#/semua-galeri" data-search-close-result>' +
+        html += '<a class="search-result" href="/semua-galeri" data-search-close-result>' +
           '<div class="search-result__type">Galeri</div>' +
           '<div class="search-result__title">' + escapeHtml(g.title) + '</div>' +
           (g.caption ? '<div class="search-result__meta">' + escapeHtml(g.caption) + '</div>' : '') + '</a>';

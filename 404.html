@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<script>
+  var path = location.pathname;
+  var hash = location.hash || '';
+  if (path !== '/') {
+    location.replace('/?r=' + encodeURIComponent(path) + hash);
+  } else {
+    location.replace('/' + hash);
+  }
+</script>

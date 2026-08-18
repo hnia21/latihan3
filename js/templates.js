@@ -29,7 +29,7 @@ window.VIEWS = {
       <div class="slideshow__dots" data-slideshow-dots></div>
     </div>
     <div class="section__more">
-      <a href="#/semua-galeri" class="btn btn--outline" data-gallery-more>Lihat Semua Galeri</a>
+      <a href="/semua-galeri" class="btn btn--outline" data-gallery-more>Lihat Semua Galeri</a>
     </div>
   </section>
 
@@ -40,7 +40,7 @@ window.VIEWS = {
     </div>
     <div class="stub-grid" data-article-list></div>
     <div class="section__more">
-      <a href="#/semua-artikel" class="btn btn--outline" data-article-more>Lihat Semua Artikel</a>
+      <a href="/semua-artikel" class="btn btn--outline" data-article-more>Lihat Semua Artikel</a>
     </div>
   </section>
 
@@ -51,7 +51,7 @@ window.VIEWS = {
     </div>
     <div class="stub-grid" data-karya-list></div>
     <div class="section__more">
-      <a href="#/semua-karya" class="btn btn--outline" data-karya-more>Lihat Semua Karya</a>
+      <a href="/semua-karya" class="btn btn--outline" data-karya-more>Lihat Semua Karya</a>
     </div>
   </section>
 
@@ -65,10 +65,10 @@ window.VIEWS = {
         </div>
       </div>
       <nav class="footer__links">
-        <a href="#/">Profil</a>
-        <a href="#/semua-galeri">Galeri</a>
-        <a href="#/semua-artikel">Artikel</a>
-        <a href="#/semua-karya">Karya</a>
+        <a href="/">Profil</a>
+        <a href="/semua-galeri">Galeri</a>
+        <a href="/semua-artikel">Artikel</a>
+        <a href="/semua-karya">Karya</a>
       </nav>
     </div>
     <div class="footer__bottom">
@@ -79,7 +79,7 @@ window.VIEWS = {
   allGallery: () => `
   <section class="section">
     <div class="section__header">
-      <a href="#/" class="back-link">&larr; Kembali</a>
+      <a href="/" class="back-link">&larr; Kembali</a>
       <p class="section__eyebrow">Portofolio Visual</p>
       <h2 class="section__title">Semua Galeri</h2>
     </div>
@@ -92,7 +92,7 @@ window.VIEWS = {
   allArticles: () => `
   <section class="section">
     <div class="section__header">
-      <a href="#/" class="back-link">&larr; Kembali</a>
+      <a href="/" class="back-link">&larr; Kembali</a>
       <p class="section__eyebrow">Artikel &amp; Tulisan</p>
       <h2 class="section__title">Semua Artikel</h2>
     </div>
@@ -105,7 +105,7 @@ window.VIEWS = {
   allKarya: () => `
   <section class="section">
     <div class="section__header">
-      <a href="#/" class="back-link">&larr; Kembali</a>
+      <a href="/" class="back-link">&larr; Kembali</a>
       <p class="section__eyebrow">Karya &amp; Proyek</p>
       <h2 class="section__title">Semua Karya</h2>
     </div>
@@ -117,7 +117,7 @@ window.VIEWS = {
 
   articleDetail: () => `
   <article class="article-detail">
-    <a href="#/" class="article-detail__back">&larr; Kembali</a>
+    <a href="/" class="article-detail__back">&larr; Kembali</a>
     <p class="article-detail__eyebrow">Artikel</p>
     <h1 data-ad-title></h1>
     <div class="article-detail__meta-row">
