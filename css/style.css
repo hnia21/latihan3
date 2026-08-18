@@ -1106,6 +1106,13 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
 .stack { max-width: 520px; }
 .stack--wide { max-width: 900px; }
 
+#view-public, #view-article, #view-all-gallery, #view-all-articles, #view-all-karya {
+  display: flex; flex-direction: column; min-height: calc(100vh - 64px);
+}
+#view-article .footer, #view-all-gallery .footer, #view-all-articles .footer, #view-all-karya .footer {
+  margin-top: auto;
+}
+
 /* ============ EDITOR (WYSIWYG) ============ */
 .editor {
   border: 1px solid var(--border);
@@ -1368,6 +1375,9 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
   .article-detail { padding: 24px 16px 56px; }
   .article-detail__meta-row { flex-wrap: wrap; row-gap: 4px; }
 
+  .article-detail .footer,
+  .all-items .footer { margin-top: 48px; }
+
   .auth { padding: 24px 14px; min-height: 60vh; }
   .auth__card { padding: 32px 24px; }
 
@@ -1382,11 +1392,28 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
   .admin__body { padding: 20px 16px 48px; }
   .admin__body h2 { font-size: 20px; }
 
+  #view-public, #view-article, #view-all-gallery, #view-all-articles, #view-all-karya {
+    display: flex; flex-direction: column; min-height: calc(100vh - 56px);
+  }
+  #view-article .footer, #view-all-gallery .footer, #view-all-articles .footer, #view-all-karya .footer {
+    margin-top: auto;
+  }
+
   .stack, .stack--wide { max-width: 100%; }
 
-  .editor__toolbar { gap: 2px; padding: 6px; }
-  .editor__btn { min-width: 28px; height: 28px; padding: 0 6px; font-size: 11px; }
+  .editor__toolbar {
+    gap: 2px; padding: 6px;
+    overflow-x: auto; flex-wrap: nowrap;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .editor__toolbar::-webkit-scrollbar { display: none; }
+  .editor__btn { min-width: 28px; height: 28px; padding: 0 6px; font-size: 11px; flex-shrink: 0; }
+  .editor__sep { flex-shrink: 0; }
   .editor__area { min-height: 200px; padding: 14px; font-size: 16px; }
+
+  .cat-select { flex-direction: column; gap: 8px; }
+  .cat-select select { min-width: 0; }
+  .cat-select .btn { width: 100%; }
 
   .admin-row { flex-wrap: wrap; }
   .admin-row__left { width: 100%; }
