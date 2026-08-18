@@ -1038,7 +1038,7 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
 }
 
 .stack { max-width: 520px; }
-.stack--wide { max-width: 780px; }
+.stack--wide { max-width: 900px; }
 
 /* ============ EDITOR (WYSIWYG) ============ */
 .editor {
@@ -1091,12 +1091,12 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
   margin: 0 4px;
 }
 .editor__area {
-  min-height: 220px;
-  max-height: 520px;
+  min-height: 340px;
+  max-height: 700px;
   overflow-y: auto;
-  padding: 16px;
+  padding: 20px;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.7;
   color: var(--text);
   outline: none;
@@ -1314,7 +1314,7 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
 
   .editor__toolbar { gap: 2px; padding: 6px; }
   .editor__btn { min-width: 28px; height: 28px; padding: 0 6px; font-size: 11px; }
-  .editor__area { min-height: 160px; padding: 12px; font-size: 16px; }
+  .editor__area { min-height: 200px; padding: 14px; font-size: 16px; }
 
   .admin-row { flex-wrap: wrap; }
   .admin-row__left { width: 100%; }

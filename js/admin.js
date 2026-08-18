@@ -24,7 +24,7 @@
       [...node.childNodes].forEach(child => {
         if (child.nodeType === 1) {
           if (!ALLOWED_TAGS.has(child.tagName)) { const p = child.parentNode; while (child.firstChild) p.insertBefore(child.firstChild, child); p.removeChild(child); return; }
-          [...child.attributes].forEach(a => { const n = a.name.toLowerCase(); if (n === 'style' && /text-align/.test(a.value)) return; if (child.tagName === 'A' && n === 'href') return; child.removeAttribute(a.name); });
+          [...child.attributes].forEach(a => { const n = a.name.toLowerCase(); if (n === 'style' && /text-align|font-size/.test(a.value)) return; if (child.tagName === 'A' && n === 'href') return; child.removeAttribute(a.name); });
           clean(child);
         } else if (child.nodeType !== 3) { node.removeChild(child); }
       });
@@ -82,7 +82,7 @@
 
   // ── admin ──────────────────────────────────────────────────────────
   async function renderAdmin() {
-    await refreshPublicData();
+    await Promise.all([refreshPublicData(), refreshCategories()]);
     viewAdmin.innerHTML = ADMIN_VIEWS.admin();
     initAdminTabs();
     Auth.logout(viewAdmin);
@@ -178,43 +178,67 @@
     });
   }
 
-  // ── categories ──────────────────────────────────────────────────
-  const CAT_KEY = '_article_cats';
-  function getCategories() {
-    try { return JSON.parse(localStorage.getItem(CAT_KEY)) || []; } catch { return []; }
+  // ── categories (supabase) ──────────────────────────────────────
+  let stateCategories = [];
+
+  async function refreshCategories() {
+    const { data, error } = await sb.from('article_categories').select('*').order('name');
+    if (!error) stateCategories = data || [];
   }
-  function saveCategories(cats) { localStorage.setItem(CAT_KEY, JSON.stringify(cats)); }
+
+  async function addCategory(name) {
+    const { error } = await sb.from('article_categories').insert({ name });
+    if (error) throw new Error(error.message);
+    await refreshCategories();
+  }
+
+  async function updateCategory(id, name) {
+    const { error } = await sb.from('article_categories').update({ name }).eq('id', id);
+    if (error) throw new Error(error.message);
+    await refreshCategories();
+  }
+
+  async function deleteCategory(id) {
+    const { error } = await sb.from('article_categories').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+    await refreshCategories();
+  }
+
   function renderCatSelect(selectEl) {
-    const cats = getCategories();
     const val = selectEl.value;
     selectEl.innerHTML = '<option value="">Pilih kategori...</option>' +
-      cats.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('');
+      stateCategories.map(c => '<option value="' + escapeHtml(c.name) + '">' + escapeHtml(c.name) + '</option>').join('');
     if (val) selectEl.value = val;
   }
+
   function renderCatList(listEl) {
-    const cats = getCategories();
-    if (cats.length === 0) { listEl.innerHTML = '<p class="empty-note">Belum ada kategori.</p>'; return; }
-    listEl.innerHTML = cats.map((c, i) =>
-      '<div class="cat-row" data-i="' + i + '">' +
-        '<span>' + escapeHtml(c) + '</span>' +
+    if (stateCategories.length === 0) { listEl.innerHTML = '<p class="empty-note">Belum ada kategori.</p>'; return; }
+    listEl.innerHTML = stateCategories.map(c =>
+      '<div class="cat-row" data-id="' + c.id + '">' +
+        '<span>' + escapeHtml(c.name) + '</span>' +
         '<div class="cat-row__actions">' +
           '<button type="button" class="btn btn--sm btn--ghost" data-cat-edit title="Ubah"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
           '<button type="button" class="btn btn--sm btn--ghost danger" data-cat-del title="Hapus"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
         '</div></div>'
     ).join('');
     listEl.querySelectorAll('[data-cat-edit]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const i = Number(btn.closest('.cat-row').dataset.i);
-        const cats = getCategories();
-        const newName = prompt('Ubah nama kategori:', cats[i]);
-        if (newName && newName.trim()) { cats[i] = newName.trim(); saveCategories(cats); renderCatList(listEl); renderCatSelect($(viewAdmin, '[data-a-category]')); }
+      btn.addEventListener('click', async () => {
+        const id = Number(btn.closest('.cat-row').dataset.id);
+        const cat = stateCategories.find(c => c.id === id);
+        if (!cat) return;
+        const newName = prompt('Ubah nama kategori:', cat.name);
+        if (newName && newName.trim() && newName.trim() !== cat.name) {
+          try { await updateCategory(id, newName.trim()); renderCatList(listEl); renderCatSelect($(viewAdmin, '[data-a-category]')); }
+          catch (err) { alert(err.message); }
+        }
       });
     });
     listEl.querySelectorAll('[data-cat-del]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const i = Number(btn.closest('.cat-row').dataset.i);
+      btn.addEventListener('click', async () => {
+        const id = Number(btn.closest('.cat-row').dataset.id);
         if (!confirm('Hapus kategori ini?')) return;
-        const cats = getCategories(); cats.splice(i, 1); saveCategories(cats); renderCatList(listEl); renderCatSelect($(viewAdmin, '[data-a-category]'));
+        try { await deleteCategory(id); renderCatList(listEl); renderCatSelect($(viewAdmin, '[data-a-category]')); }
+        catch (err) { alert(err.message); }
       });
     });
   }
@@ -240,12 +264,13 @@
     const catManager = $(viewAdmin, '[data-cat-manager]');
     const catList = $(viewAdmin, '[data-cat-list]');
     const catInput = $(viewAdmin, '[data-cat-input]');
-    $(viewAdmin, '[data-cat-manage]')?.addEventListener('click', () => { catManager.hidden = !catManager.hidden; if (!catManager.hidden) renderCatList(catList); });
+    $(viewAdmin, '[data-cat-manage]')?.addEventListener('click', async () => { catManager.hidden = !catManager.hidden; if (!catManager.hidden) { await refreshCategories(); renderCatList(catList); } });
     $(viewAdmin, '[data-cat-close]')?.addEventListener('click', () => { catManager.hidden = true; });
-    $(viewAdmin, '[data-cat-add]')?.addEventListener('click', () => {
+    $(viewAdmin, '[data-cat-add]')?.addEventListener('click', async () => {
       const v = catInput.value.trim(); if (!v) return;
-      const cats = getCategories(); if (cats.includes(v)) { alert('Kategori sudah ada.'); return; }
-      cats.push(v); saveCategories(cats); catInput.value = ''; renderCatList(catList); renderCatSelect(aCat);
+      if (stateCategories.some(c => c.name === v)) { alert('Kategori sudah ada.'); return; }
+      try { await addCategory(v); catInput.value = ''; renderCatList(catList); renderCatSelect(aCat); }
+      catch (err) { alert(err.message); }
     });
     catInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $(viewAdmin, '[data-cat-add]')?.click(); } });
 
@@ -263,11 +288,30 @@
           const url = prompt('Masukkan URL tautan:', 'https://');
           if (url) document.execCommand('createLink', false, url);
         }
+        else if (cmd === 'fontSizeUp') changeFontSize(aBody, 1);
+        else if (cmd === 'fontSizeDown') changeFontSize(aBody, -1);
         else document.execCommand(cmd, false, null);
         syncToolbar(aToolbar);
       });
     }
-    if (aBody) { aBody.addEventListener('keyup', () => syncToolbar(aToolbar)); aBody.addEventListener('mouseup', () => syncToolbar(aToolbar)); aBody.addEventListener('focus', () => syncToolbar(aToolbar)); }
+
+    if (aBody) {
+      aBody.addEventListener('keyup', () => syncToolbar(aToolbar));
+      aBody.addEventListener('mouseup', () => syncToolbar(aToolbar));
+      aBody.addEventListener('focus', () => syncToolbar(aToolbar));
+      aBody.addEventListener('paste', e => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+        document.execCommand('insertText', false, text);
+      });
+      aBody.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          document.execCommand('insertParagraph', false, null);
+        }
+      });
+    }
+
     function resetForm() { aId.value=''; aTitle.value=''; aAuth.value=''; aCat.value=''; aExc.value=''; aBody.innerHTML=''; aImg.value=''; aStat.textContent=''; aCurImg=null; aSub.textContent='Tambah artikel'; aCancel.hidden=true; }
     aCancel.addEventListener('click', resetForm);
     form.addEventListener('submit', async (e) => {
@@ -293,18 +337,37 @@
         const item = state.articles.find(a => String(a.id) === id);
         if (!item) return;
         aId.value=item.id; aTitle.value=item.title; aAuth.value=item.author||''; aCat.value=item.category||''; aExc.value=item.excerpt||''; aBody.innerHTML=item.body||'';
-        aCurImg=item.image_url||null; aStat.textContent=item.image_url?'Gambar saat ini akan dipakai kecuali Anda pilih file new.':'';
+        aCurImg=item.image_url||null; aStat.textContent=item.image_url?'Gambar saat ini akan dipakai kecuali Anda pilih file baru.':'';
         aSub.textContent='Simpan perubahan'; aCancel.hidden=false; window.scrollTo({top:0,behavior:'smooth'}); return;
       }
       const del = e.target.closest('[data-delete]');
       if (del) { try { await sbQuery(sb.from('articles').delete().eq('id', del.closest('.admin-row').dataset.id)); await refreshPublicData(); renderArticleAdminList(); } catch (err) { alert(err.message); } }
     });
   }
+
+  function changeFontSize(container, dir) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const fontSizes = [1, 2, 3, 4, 5, 6, 7];
+    let currentSize = 3;
+    try { currentSize = parseInt(document.queryCommandValue('fontSize')) || 3; } catch (_) {}
+    const idx = fontSizes.indexOf(currentSize);
+    const next = fontSizes[Math.max(0, Math.min(fontSizes.length - 1, idx + dir))];
+    document.execCommand('fontSize', false, String(next));
+    container.querySelectorAll('font[size]').forEach(f => {
+      const s = f.getAttribute('size');
+      const px = { '1': '12px', '2': '14px', '3': '16px', '4': '18px', '5': '22px', '6': '28px', '7': '36px' }[s] || '16px';
+      const span = document.createElement('span');
+      span.style.fontSize = px;
+      span.innerHTML = f.innerHTML;
+      f.parentNode.replaceChild(span, f);
+    });
+  }
   function syncToolbar(toolbar) {
     if (!toolbar) return;
     toolbar.querySelectorAll('[data-cmd]').forEach(btn => {
       const cmd = btn.dataset.cmd; let active = false;
-      try { if (['bold','italic','underline','justifyLeft','justifyCenter','justifyRight','justifyFull','insertUnorderedList','insertOrderedList'].includes(cmd)) active = document.queryCommandState(cmd); } catch (_) {}
+      try { if (['bold','italic','underline','strikeThrough','justifyLeft','justifyCenter','justifyRight','justifyFull','insertUnorderedList','insertOrderedList'].includes(cmd)) active = document.queryCommandState(cmd); } catch (_) {}
       btn.classList.toggle('is-active', active);
     });
   }
