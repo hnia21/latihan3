@@ -325,6 +325,22 @@
     menu.innerHTML = html;
   }
 
+  const artikelDropdown = document.querySelector('[data-artikel-dropdown]');
+  if (artikelDropdown) {
+    const trigger = artikelDropdown.querySelector('.topbar__dropdown-trigger');
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      artikelDropdown.classList.toggle('is-open');
+    });
+    artikelDropdown.querySelector('[data-artikel-dropdown-menu]').addEventListener('click', () => {
+      artikelDropdown.classList.remove('is-open');
+    });
+    document.addEventListener('click', (e) => {
+      if (!artikelDropdown.contains(e.target)) artikelDropdown.classList.remove('is-open');
+    });
+  }
+
   function currentRoute() { return (location.hash || '#/').replace(/^#/, '') || '/'; }
 
   async function router() {
