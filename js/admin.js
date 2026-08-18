@@ -16,7 +16,7 @@
     d.innerHTML = html || '';
     return d.textContent || '';
   }
-  const ALLOWED_TAGS = new Set(['B','STRONG','I','EM','U','P','DIV','BR','UL','OL','LI','H2','H3','BLOCKQUOTE','A','SPAN']);
+  const ALLOWED_TAGS = new Set(['B','STRONG','I','EM','U','P','DIV','BR','UL','OL','LI','H2','H3','BLOCKQUOTE','A','SPAN','PRE','HR']);
   function sanitizeRichHtml(html) {
     const d = document.createElement('div');
     d.innerHTML = html || '';
@@ -178,12 +178,54 @@
     });
   }
 
+  // ── categories ──────────────────────────────────────────────────
+  const CAT_KEY = '_article_cats';
+  function getCategories() {
+    try { return JSON.parse(localStorage.getItem(CAT_KEY)) || []; } catch { return []; }
+  }
+  function saveCategories(cats) { localStorage.setItem(CAT_KEY, JSON.stringify(cats)); }
+  function renderCatSelect(selectEl) {
+    const cats = getCategories();
+    const val = selectEl.value;
+    selectEl.innerHTML = '<option value="">Pilih kategori...</option>' +
+      cats.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('');
+    if (val) selectEl.value = val;
+  }
+  function renderCatList(listEl) {
+    const cats = getCategories();
+    if (cats.length === 0) { listEl.innerHTML = '<p class="empty-note">Belum ada kategori.</p>'; return; }
+    listEl.innerHTML = cats.map((c, i) =>
+      '<div class="cat-row" data-i="' + i + '">' +
+        '<span>' + escapeHtml(c) + '</span>' +
+        '<div class="cat-row__actions">' +
+          '<button type="button" class="btn btn--sm btn--ghost" data-cat-edit title="Ubah"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+          '<button type="button" class="btn btn--sm btn--ghost danger" data-cat-del title="Hapus"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>' +
+        '</div></div>'
+    ).join('');
+    listEl.querySelectorAll('[data-cat-edit]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const i = Number(btn.closest('.cat-row').dataset.i);
+        const cats = getCategories();
+        const newName = prompt('Ubah nama kategori:', cats[i]);
+        if (newName && newName.trim()) { cats[i] = newName.trim(); saveCategories(cats); renderCatList(listEl); renderCatSelect($(viewAdmin, '[data-a-category]')); }
+      });
+    });
+    listEl.querySelectorAll('[data-cat-del]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const i = Number(btn.closest('.cat-row').dataset.i);
+        if (!confirm('Hapus kategori ini?')) return;
+        const cats = getCategories(); cats.splice(i, 1); saveCategories(cats); renderCatList(listEl); renderCatSelect($(viewAdmin, '[data-a-category]'));
+      });
+    });
+  }
+
   // ── article ────────────────────────────────────────────────────────
   function initArticleForm() {
     const form = $(viewAdmin, '[data-article-form]');
     const aId = $(viewAdmin, '[data-a-id]');
     const aTitle = $(viewAdmin, '[data-a-title]');
     const aAuth  = $(viewAdmin, '[data-a-author]');
+    const aCat   = $(viewAdmin, '[data-a-category]');
     const aExc   = $(viewAdmin, '[data-a-excerpt]');
     const aBody  = $(viewAdmin, '[data-a-body]');
     const aToolbar = $(viewAdmin, '[data-a-toolbar]');
@@ -192,6 +234,21 @@
     const aSub   = $(viewAdmin, '[data-a-submit]');
     const aCancel= $(viewAdmin, '[data-a-cancel]');
     let aCurImg  = null;
+
+    renderCatSelect(aCat);
+
+    const catManager = $(viewAdmin, '[data-cat-manager]');
+    const catList = $(viewAdmin, '[data-cat-list]');
+    const catInput = $(viewAdmin, '[data-cat-input]');
+    $(viewAdmin, '[data-cat-manage]')?.addEventListener('click', () => { catManager.hidden = !catManager.hidden; if (!catManager.hidden) renderCatList(catList); });
+    $(viewAdmin, '[data-cat-close]')?.addEventListener('click', () => { catManager.hidden = true; });
+    $(viewAdmin, '[data-cat-add]')?.addEventListener('click', () => {
+      const v = catInput.value.trim(); if (!v) return;
+      const cats = getCategories(); if (cats.includes(v)) { alert('Kategori sudah ada.'); return; }
+      cats.push(v); saveCategories(cats); catInput.value = ''; renderCatList(catList); renderCatSelect(aCat);
+    });
+    catInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $(viewAdmin, '[data-cat-add]')?.click(); } });
+
     renderArticleAdminList();
     if (aToolbar) {
       aToolbar.addEventListener('click', e => {
@@ -199,13 +256,19 @@
         if (!btn) return; e.preventDefault(); aBody.focus();
         const cmd = btn.dataset.cmd;
         if (cmd === 'formatBlockH2') document.execCommand('formatBlock', false, 'H2');
+        else if (cmd === 'formatBlockH3') document.execCommand('formatBlock', false, 'H3');
         else if (cmd === 'formatBlockQuote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+        else if (cmd === 'formatBlockPre') document.execCommand('formatBlock', false, 'PRE');
+        else if (cmd === 'createLink') {
+          const url = prompt('Masukkan URL tautan:', 'https://');
+          if (url) document.execCommand('createLink', false, url);
+        }
         else document.execCommand(cmd, false, null);
         syncToolbar(aToolbar);
       });
     }
     if (aBody) { aBody.addEventListener('keyup', () => syncToolbar(aToolbar)); aBody.addEventListener('mouseup', () => syncToolbar(aToolbar)); aBody.addEventListener('focus', () => syncToolbar(aToolbar)); }
-    function resetForm() { aId.value=''; aTitle.value=''; aAuth.value=''; aExc.value=''; aBody.innerHTML=''; aImg.value=''; aStat.textContent=''; aCurImg=null; aSub.textContent='Tambah artikel'; aCancel.hidden=true; }
+    function resetForm() { aId.value=''; aTitle.value=''; aAuth.value=''; aCat.value=''; aExc.value=''; aBody.innerHTML=''; aImg.value=''; aStat.textContent=''; aCurImg=null; aSub.textContent='Tambah artikel'; aCancel.hidden=true; }
     aCancel.addEventListener('click', resetForm);
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -215,7 +278,7 @@
       try {
         let imageUrl = aCurImg;
         if (aImg.files && aImg.files[0]) { aStat.textContent = 'Mengunggah gambar...'; imageUrl = await uploadImage(aImg.files[0]); }
-        const payload = { title, author: aAuth.value.trim(), excerpt: aExc.value.trim(), body: sanitizeRichHtml(aBody.innerHTML.trim()), image_url: imageUrl };
+        const payload = { title, author: aAuth.value.trim(), category: aCat.value.trim(), excerpt: aExc.value.trim(), body: sanitizeRichHtml(aBody.innerHTML.trim()), image_url: imageUrl };
         if (aId.value) await sbQuery(sb.from('articles').update(payload).eq('id', aId.value));
         else await sbQuery(sb.from('articles').insert(payload));
         resetForm(); await refreshPublicData(); renderArticleAdminList();
@@ -229,8 +292,8 @@
         const id = btn.closest('.admin-row').dataset.id;
         const item = state.articles.find(a => String(a.id) === id);
         if (!item) return;
-        aId.value=item.id; aTitle.value=item.title; aAuth.value=item.author||''; aExc.value=item.excerpt||''; aBody.innerHTML=item.body||'';
-        aCurImg=item.image_url||null; aStat.textContent=item.image_url?'Gambar saat ini akan dipakai kecuali Anda pilih file baru.':'';
+        aId.value=item.id; aTitle.value=item.title; aAuth.value=item.author||''; aCat.value=item.category||''; aExc.value=item.excerpt||''; aBody.innerHTML=item.body||'';
+        aCurImg=item.image_url||null; aStat.textContent=item.image_url?'Gambar saat ini akan dipakai kecuali Anda pilih file new.':'';
         aSub.textContent='Simpan perubahan'; aCancel.hidden=false; window.scrollTo({top:0,behavior:'smooth'}); return;
       }
       const del = e.target.closest('[data-delete]');
@@ -252,7 +315,7 @@
     wrap.innerHTML = state.articles.map(a =>
       '<div class="admin-row" data-id="' + a.id + '">' +
         '<div class="admin-row__left">' + (a.image_url ? '<img class="admin-row__thumb" src="' + escapeHtml(a.image_url) + '" alt="">' : '') +
-        '<div><div class="admin-row__title">' + escapeHtml(a.title) + '</div><div class="admin-row__meta">' + (a.author ? escapeHtml(a.author)+' &middot; ' : '') + new Date(a.created_at).toLocaleDateString('id-ID') + '</div></div></div>' +
+        '<div><div class="admin-row__title">' + escapeHtml(a.title) + '</div><div class="admin-row__meta">' + (a.category ? '<span class="admin-row__tag">' + escapeHtml(a.category) + '</span> ' : '') + (a.author ? escapeHtml(a.author)+' &middot; ' : '') + new Date(a.created_at).toLocaleDateString('id-ID') + '</div></div></div>' +
         '<div class="admin-row__actions"><button data-edit>Ubah</button><button data-delete class="danger">Hapus</button></div></div>'
     ).join('');
   }
