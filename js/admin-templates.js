@@ -17,7 +17,7 @@ window.ADMIN_VIEWS = {
         <p class="field-error" data-login-error hidden></p>
         <button type="submit" class="btn btn--primary" data-login-submit>Masuk</button>
       </form>
-      <a href="index.html" class="auth__back">Kembali ke situs</a>
+      <a href="/" class="auth__back">Kembali ke situs</a>
     </div>
   </section>`,
 
