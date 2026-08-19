@@ -338,7 +338,12 @@
     trigger.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      artikelDropdown.classList.toggle('is-open');
+      if (artikelDropdown.classList.contains('is-open')) {
+        artikelDropdown.classList.remove('is-open');
+        navigateTo('/semua-artikel');
+      } else {
+        artikelDropdown.classList.add('is-open');
+      }
     });
     artikelDropdown.querySelector('[data-artikel-dropdown-menu]').addEventListener('click', () => {
       artikelDropdown.classList.remove('is-open');
@@ -362,6 +367,11 @@
     router();
   }
 
+  async function ensureData() {
+    if (state.profile && state.gallery.length) return;
+    await refreshPublicData();
+  }
+
   async function router() {
     const id = ++navId;
     const route = currentRoute();
@@ -382,29 +392,29 @@
       }
 
       if (route === '/semua-galeri') {
-        await refreshPublicData();
+        await ensureData();
         if (id !== navId) return;
         renderAllGallery(); viewAllGallery.hidden = false; window.scrollTo({ top: 0 }); return;
       }
       if (route === '/semua-artikel') {
-        await refreshPublicData();
+        await ensureData();
         if (id !== navId) return;
         renderAllArticles(); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
       }
       const catMatch = route.match(/^\/kategori\/(.+)$/);
       if (catMatch) {
         const catName = decodeURIComponent(catMatch[1]);
-        await refreshPublicData();
+        await ensureData();
         if (id !== navId) return;
         renderAllArticles('', catName); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
       }
       if (route === '/semua-karya') {
-        await refreshPublicData();
+        await ensureData();
         if (id !== navId) return;
         renderAllKarya(); viewAllKarya.hidden = false; window.scrollTo({ top: 0 }); return;
       }
 
-      await refreshPublicData();
+      await ensureData();
       if (id !== navId) return;
       renderPublic(); viewPublic.hidden = false; buildArtikelDropdown();
 

@@ -1,6 +1,7 @@
 /* ============================================================
    CORPORATE PROFESSIONAL — BLUE THEME
    ============================================================ */
+[hidden] { display: none !important; }
 :root {
   --ink: #0f172a;
   --ink-soft: #1e293b;
