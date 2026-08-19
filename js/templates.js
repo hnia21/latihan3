@@ -35,12 +35,12 @@ window.VIEWS = {
 
   <section class="section section--alt" id="artikel">
     <div class="section__header">
-      <p class="section__eyebrow">Artikel &amp; Tulisan</p>
-      <h2 class="section__title">Artikel terbaru</h2>
+      <p class="section__eyebrow">Tulisan</p>
+      <h2 class="section__title">Tulisan terbaru</h2>
     </div>
     <div class="stub-grid" data-article-list></div>
     <div class="section__more">
-      <a href="/semua-artikel" class="btn btn--outline" data-article-more>Lihat Semua Artikel</a>
+      <a href="/semua-artikel" class="btn btn--outline" data-article-more>Lihat Semua Tulisan</a>
     </div>
   </section>
 
@@ -67,7 +67,7 @@ window.VIEWS = {
       <nav class="footer__links">
         <a href="/">Profil</a>
         <a href="/semua-galeri">Galeri</a>
-        <a href="/semua-artikel">Artikel</a>
+        <a href="/semua-artikel">Tulisan</a>
         <a href="/semua-karya">Karya</a>
       </nav>
     </div>
