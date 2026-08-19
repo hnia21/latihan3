@@ -51,7 +51,7 @@
       if (a && !a.error) state.articles = a.data || [];
       if (k && !k.error) state.karya = k.data || [];
       if (c && !c.error) state.categories = c.data || [];
-      buildArtikelDropdown();
+      buildTulisanDropdown();
     } catch (err) {
       console.error('Gagal memuat data:', err);
     }
@@ -162,16 +162,16 @@
 
     const al = $(viewPublic, '[data-article-list]');
     if (state.articles.length === 0) {
-      al.innerHTML = '<p class="empty-note">Belum ada artikel.</p>';
+      al.innerHTML = '<p class="empty-note">Belum ada tulisan.</p>';
     } else {
       al.innerHTML = state.articles.slice(0, MAX_ITEMS).map((a, i) =>
         '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
           (a.image_url ? '<img class="stub-card__image" src="' + escapeHtml(a.image_url) + '" alt="' + escapeHtml(a.title) + '" loading="lazy">' : '') +
           '<div class="stub-card__content">' +
-            '<p class="stub-card__tag">Artikel' + (a.author ? ' &middot; ' + escapeHtml(a.author) : '') + '</p>' +
+            '<p class="stub-card__tag">Tulisan' + (a.author ? ' &middot; ' + escapeHtml(a.author) : '') + '</p>' +
             '<h3>' + escapeHtml(a.title) + '</h3>' +
             '<p>' + escapeHtml(a.excerpt || stripHtml(a.body).slice(0, 120)) + '</p>' +
-            '<a class="stub-card__link" href="/artikel/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
+            '<a class="stub-card__link" href="/tulisan/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
           '</div></article>'
       ).join('');
     }
@@ -237,20 +237,20 @@
       (a.title || '').toLowerCase().includes(q) || (a.author || '').toLowerCase().includes(q)
     );
     if (filtered.length === 0) {
-      wrap.innerHTML = '<p class="empty-note">' + (q || category ? 'Tidak ada artikel yang cocok.' : 'Belum ada artikel.') + '</p>';
+      wrap.innerHTML = '<p class="empty-note">' + (q || category ? 'Tidak ada tulisan yang cocok.' : 'Belum ada tulisan.') + '</p>';
     } else {
       wrap.innerHTML = filtered.map((a, i) =>
         '<article class="stub-card" data-reveal style="transition-delay:' + Math.min(i, 6) * 60 + 'ms">' +
           (a.image_url ? '<img class="stub-card__image" src="' + escapeHtml(a.image_url) + '" alt="' + escapeHtml(a.title) + '" loading="lazy">' : '') +
           '<div class="stub-card__content">' +
-            '<p class="stub-card__tag">Artikel' + (a.author ? ' &middot; ' + escapeHtml(a.author) : '') + '</p>' +
+            '<p class="stub-card__tag">Tulisan' + (a.author ? ' &middot; ' + escapeHtml(a.author) : '') + '</p>' +
             '<h3>' + escapeHtml(a.title) + '</h3>' +
             '<p>' + escapeHtml(a.excerpt || stripHtml(a.body).slice(0, 120)) + '</p>' +
-            '<a class="stub-card__link" href="/artikel/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
+            '<a class="stub-card__link" href="/tulisan/' + a.id + '" target="_blank">Baca selengkapnya</a>' +
           '</div></article>'
       ).join('');
     }
-    const input = $(viewAllArticles, '[data-search-artikel]');
+    const input = $(viewAllArticles, '[data-search-tulisan]');
     if (input) {
       input.value = query || '';
       input.addEventListener('input', () => { renderAllArticles(input.value, category); });
@@ -304,7 +304,7 @@
     if (article.image_url) { imgEl.src = article.image_url; imgEl.alt = article.title; imgEl.hidden = false; }
     else imgEl.hidden = true;
     const bodyEl = $(viewArticle, '[data-ad-body]');
-    const body = article.body || article.excerpt || 'Belum ada isi untuk artikel ini.';
+    const body = article.body || article.excerpt || 'Belum ada isi untuk tulisan ini.';
     if (/<[a-z][\s\S]*>/i.test(body)) bodyEl.innerHTML = sanitizeRichHtml(body);
     else bodyEl.textContent = body;
     document.title = article.title;
@@ -320,11 +320,11 @@
     targets.forEach(el => obs.observe(el));
   }
 
-  function buildArtikelDropdown() {
-    const menu = document.querySelector('[data-artikel-dropdown-menu]');
+  function buildTulisanDropdown() {
+    const menu = document.querySelector('[data-tulisan-dropdown-menu]');
     if (!menu) return;
     const route = currentRoute();
-    let html = '<a href="/semua-artikel">Semua Artikel</a>';
+    let html = '<a href="/semua-tulisan">Semua Tulisan</a>';
     state.categories.forEach(c => {
       const active = route === '/kategori/' + encodeURIComponent(c.name) ? ' is-active' : '';
       html += '<a href="/kategori/' + encodeURIComponent(c.name) + '"' + active + '>' + escapeHtml(c.name) + '</a>';
@@ -332,24 +332,24 @@
     menu.innerHTML = html;
   }
 
-  const artikelDropdown = document.querySelector('[data-artikel-dropdown]');
-  if (artikelDropdown) {
-    const trigger = artikelDropdown.querySelector('.topbar__dropdown-trigger');
+  const tulisanDropdown = document.querySelector('[data-tulisan-dropdown]');
+  if (tulisanDropdown) {
+    const trigger = tulisanDropdown.querySelector('.topbar__dropdown-trigger');
     trigger.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (artikelDropdown.classList.contains('is-open')) {
-        artikelDropdown.classList.remove('is-open');
-        navigateTo('/semua-artikel');
+      if (tulisanDropdown.classList.contains('is-open')) {
+        tulisanDropdown.classList.remove('is-open');
+        navigateTo('/semua-tulisan');
       } else {
-        artikelDropdown.classList.add('is-open');
+        tulisanDropdown.classList.add('is-open');
       }
     });
-    artikelDropdown.querySelector('[data-artikel-dropdown-menu]').addEventListener('click', () => {
-      artikelDropdown.classList.remove('is-open');
+    tulisanDropdown.querySelector('[data-tulisan-dropdown-menu]').addEventListener('click', () => {
+      tulisanDropdown.classList.remove('is-open');
     });
     document.addEventListener('click', (e) => {
-      if (!artikelDropdown.contains(e.target)) artikelDropdown.classList.remove('is-open');
+      if (!tulisanDropdown.contains(e.target)) tulisanDropdown.classList.remove('is-open');
     });
   }
 
@@ -378,7 +378,7 @@
     hideAll();
 
     try {
-      const artMatch = route.match(/^\/artikel\/(.+)$/);
+      const artMatch = route.match(/^\/tulisan\/(.+)$/);
       if (artMatch) {
         try {
           const { data } = sb ? await sb.from('articles').select('*').eq('id', artMatch[1]).single() : { data: null };
@@ -387,7 +387,7 @@
           else { navigateTo('/'); return; }
         } catch (_) {
           if (id !== navId) return;
-          renderPublic(); viewPublic.hidden = false; buildArtikelDropdown(); return;
+          renderPublic(); viewPublic.hidden = false; buildTulisanDropdown(); return;
         }
       }
 
@@ -396,7 +396,7 @@
         if (id !== navId) return;
         renderAllGallery(); viewAllGallery.hidden = false; window.scrollTo({ top: 0 }); return;
       }
-      if (route === '/semua-artikel') {
+      if (route === '/semua-tulisan') {
         await ensureData();
         if (id !== navId) return;
         renderAllArticles(); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
@@ -416,14 +416,14 @@
 
       await ensureData();
       if (id !== navId) return;
-      renderPublic(); viewPublic.hidden = false; buildArtikelDropdown();
+      renderPublic(); viewPublic.hidden = false; buildTulisanDropdown();
 
-      if (route === '/artikel') $(viewPublic, '#artikel')?.scrollIntoView({ behavior: 'smooth' });
+      if (route === '/tulisan') $(viewPublic, '#tulisan')?.scrollIntoView({ behavior: 'smooth' });
       else if (route === '/karya') $(viewPublic, '#karya')?.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       console.error('Router error:', err);
       if (id !== navId) return;
-      renderPublic(); viewPublic.hidden = false; buildArtikelDropdown();
+      renderPublic(); viewPublic.hidden = false; buildTulisanDropdown();
     }
   }
 
@@ -491,8 +491,8 @@
       if (!q) { searchResults.innerHTML = ''; return; }
       let html = '';
       state.articles.filter(a => (a.title || '').toLowerCase().includes(q) || (a.author || '').toLowerCase().includes(q)).forEach(a => {
-        html += '<a class="search-result" href="/artikel/' + a.id + '" data-search-close-result>' +
-          '<div class="search-result__type">Artikel</div>' +
+        html += '<a class="search-result" href="/tulisan/' + a.id + '" data-search-close-result>' +
+          '<div class="search-result__type">Tulisan</div>' +
           '<div class="search-result__title">' + escapeHtml(a.title) + '</div>' +
           (a.author ? '<div class="search-result__meta">' + escapeHtml(a.author) + '</div>' : '') + '</a>';
       });

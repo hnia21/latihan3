@@ -33,14 +33,14 @@ window.VIEWS = {
     </div>
   </section>
 
-  <section class="section section--alt" id="artikel">
+  <section class="section section--alt" id="tulisan">
     <div class="section__header">
       <p class="section__eyebrow">Tulisan</p>
       <h2 class="section__title">Tulisan terbaru</h2>
     </div>
     <div class="stub-grid" data-article-list></div>
     <div class="section__more">
-      <a href="/semua-artikel" class="btn btn--outline" data-article-more>Lihat Semua Tulisan</a>
+      <a href="/semua-tulisan" class="btn btn--outline" data-article-more>Lihat Semua Tulisan</a>
     </div>
   </section>
 
@@ -67,7 +67,7 @@ window.VIEWS = {
       <nav class="footer__links">
         <a href="/">Profil</a>
         <a href="/semua-galeri">Galeri</a>
-        <a href="/semua-artikel">Tulisan</a>
+        <a href="/semua-tulisan">Tulisan</a>
         <a href="/semua-karya">Karya</a>
       </nav>
     </div>
@@ -93,11 +93,11 @@ window.VIEWS = {
   <section class="section">
     <div class="section__header">
       <a href="/" class="back-link">&larr; Kembali</a>
-      <p class="section__eyebrow">Artikel &amp; Tulisan</p>
-      <h2 class="section__title">Semua Artikel</h2>
+      <p class="section__eyebrow">Tulisan</p>
+      <h2 class="section__title">Semua Tulisan</h2>
     </div>
     <div class="search-bar">
-      <input type="text" data-search-artikel placeholder="Cari berdasarkan judul atau penulis..." class="search-input">
+      <input type="text" data-search-tulisan placeholder="Cari berdasarkan judul atau penulis..." class="search-input">
     </div>
     <div class="stub-grid" data-all-articles-list></div>
   </section>` + (window.VIEWS.public().match(/<footer[\s\S]*$/) || [''])[0],
@@ -118,7 +118,7 @@ window.VIEWS = {
   articleDetail: () => `
   <article class="article-detail">
     <a href="/" class="article-detail__back">&larr; Kembali</a>
-    <p class="article-detail__eyebrow">Artikel</p>
+    <p class="article-detail__eyebrow">Tulisan</p>
     <h1 data-ad-title></h1>
     <div class="article-detail__meta-row">
       <span class="article-detail__author" data-ad-author hidden></span>
