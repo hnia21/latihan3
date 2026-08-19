@@ -4,7 +4,9 @@
   const SUPABASE_URL = 'https://ynrgauifgghtjogaxzcz.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucmdhdWlmZ2dodGpvZ2F4emN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5NTAyMTcsImV4cCI6MjEwMjUyNjIxN30.Bjeb68YsAAKhsgsXtEGIOem1HsZr4HybgB6-T0aL3V0';
   const BUCKET_NAME = 'gallery';
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let sb;
+  try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+  catch (_) { console.error('Supabase gagal dimuat. Menu offline.'); }
 
   function escapeHtml(s) {
     const d = document.createElement('div');
@@ -35,19 +37,24 @@
   let state = { profile: null, gallery: [], articles: [], karya: [], categories: [] };
 
   async function refreshPublicData() {
-    const [p, g, a, k, c] = await Promise.all([
-      sb.from('profile').select('*').order('id').limit(1).maybeSingle(),
-      sb.from('gallery').select('*').order('created_at', { ascending: false }),
-      sb.from('articles').select('*').order('created_at', { ascending: false }),
-      sb.from('karya').select('*').order('created_at', { ascending: false }),
-      sb.from('article_categories').select('*').order('name')
-    ]);
-    state.profile = p.data;
-    state.gallery = g.data || [];
-    state.articles = a.data || [];
-    state.karya = k.data || [];
-    state.categories = c.data || [];
-    buildArtikelDropdown();
+    if (!sb) return;
+    try {
+      const [p, g, a, k, c] = await Promise.all([
+        sb.from('profile').select('*').order('id').limit(1).maybeSingle(),
+        sb.from('gallery').select('*').order('created_at', { ascending: false }),
+        sb.from('articles').select('*').order('created_at', { ascending: false }),
+        sb.from('karya').select('*').order('created_at', { ascending: false }),
+        sb.from('article_categories').select('*').order('name')
+      ]);
+      if (p && !p.error) state.profile = p.data;
+      if (g && !g.error) state.gallery = g.data || [];
+      if (a && !a.error) state.articles = a.data || [];
+      if (k && !k.error) state.karya = k.data || [];
+      if (c && !c.error) state.categories = c.data || [];
+      buildArtikelDropdown();
+    } catch (err) {
+      console.error('Gagal memuat data:', err);
+    }
   }
 
   const viewPublic      = document.getElementById('view-public');
@@ -348,41 +355,66 @@
     return p === '/' ? '/' : p;
   }
 
+  let navId = 0;
+
   function navigateTo(path) {
     history.pushState(null, '', path);
     router();
   }
 
   async function router() {
+    const id = ++navId;
     const route = currentRoute();
     hideAll();
 
-    const artMatch = route.match(/^\/artikel\/(.+)$/);
-    if (artMatch) {
-      const { data } = await sb.from('articles').select('*').eq('id', artMatch[1]).single();
-      if (data) { renderArticleDetail(data); viewArticle.hidden = false; window.scrollTo({ top: 0 }); return; }
-      else { navigateTo('/'); }
-    }
+    try {
+      const artMatch = route.match(/^\/artikel\/(.+)$/);
+      if (artMatch) {
+        try {
+          const { data } = sb ? await sb.from('articles').select('*').eq('id', artMatch[1]).single() : { data: null };
+          if (id !== navId) return;
+          if (data) { renderArticleDetail(data); viewArticle.hidden = false; window.scrollTo({ top: 0 }); return; }
+          else { navigateTo('/'); return; }
+        } catch (_) {
+          if (id !== navId) return;
+          renderPublic(); viewPublic.hidden = false; buildArtikelDropdown(); return;
+        }
+      }
 
-    if (route === '/semua-galeri') {
-      await refreshPublicData(); renderAllGallery(); viewAllGallery.hidden = false; window.scrollTo({ top: 0 }); return;
-    }
-    if (route === '/semua-artikel') {
-      await refreshPublicData(); renderAllArticles(); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
-    }
-    const catMatch = route.match(/^\/kategori\/(.+)$/);
-    if (catMatch) {
-      const catName = decodeURIComponent(catMatch[1]);
-      await refreshPublicData(); renderAllArticles('', catName); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
-    }
-    if (route === '/semua-karya') {
-      await refreshPublicData(); renderAllKarya(); viewAllKarya.hidden = false; window.scrollTo({ top: 0 }); return;
-    }
+      if (route === '/semua-galeri') {
+        await refreshPublicData();
+        if (id !== navId) return;
+        renderAllGallery(); viewAllGallery.hidden = false; window.scrollTo({ top: 0 }); return;
+      }
+      if (route === '/semua-artikel') {
+        await refreshPublicData();
+        if (id !== navId) return;
+        renderAllArticles(); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
+      }
+      const catMatch = route.match(/^\/kategori\/(.+)$/);
+      if (catMatch) {
+        const catName = decodeURIComponent(catMatch[1]);
+        await refreshPublicData();
+        if (id !== navId) return;
+        renderAllArticles('', catName); viewAllArticles.hidden = false; window.scrollTo({ top: 0 }); return;
+      }
+      if (route === '/semua-karya') {
+        await refreshPublicData();
+        if (id !== navId) return;
+        renderAllKarya(); viewAllKarya.hidden = false; window.scrollTo({ top: 0 }); return;
+      }
 
-    await refreshPublicData(); renderPublic(); viewPublic.hidden = false; buildArtikelDropdown();
+      await refreshPublicData();
+      if (id !== navId) return;
+      renderPublic(); viewPublic.hidden = false; buildArtikelDropdown();
 
-    if (route === '/artikel') $(viewPublic, '#artikel')?.scrollIntoView({ behavior: 'smooth' });
-    else if (route === '/karya') $(viewPublic, '#karya')?.scrollIntoView({ behavior: 'smooth' });
+      if (route === '/artikel') $(viewPublic, '#artikel')?.scrollIntoView({ behavior: 'smooth' });
+      else if (route === '/karya') $(viewPublic, '#karya')?.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      console.error('Router error:', err);
+      if (id !== navId) return;
+      renderPublic(); viewPublic.hidden = false; buildArtikelDropdown();
+    }
   }
 
   window.addEventListener('popstate', router);
@@ -403,10 +435,12 @@
   if (brand) {
     brand.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       logoClicks++;
       clearTimeout(logoTimer);
       logoTimer = setTimeout(() => { logoClicks = 0; }, 2000);
       if (logoClicks >= 5) { logoClicks = 0; location.href = 'admin.html'; }
+      else { navigateTo('/'); }
     });
   }
 
