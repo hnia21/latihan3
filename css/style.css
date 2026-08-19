@@ -1106,10 +1106,13 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
 .stack { max-width: 520px; }
 .stack--wide { max-width: 900px; }
 
-#view-public, #view-article, #view-all-gallery, #view-all-articles, #view-all-karya {
+#view-public, #view-article {
   display: flex; flex-direction: column; min-height: calc(100vh - 64px);
 }
-#view-article .footer, #view-all-gallery .footer, #view-all-articles .footer, #view-all-karya .footer {
+#view-all-gallery, #view-all-articles, #view-all-karya {
+  display: flex; flex-direction: column;
+}
+#view-public .footer, #view-article .footer {
   margin-top: auto;
 }
 
@@ -1410,10 +1413,10 @@ body, .topbar, .topbar__links a, .topbar__brand, .topbar__icon,
   .admin__body { padding: 24px 20px 48px; }
   .admin__body h2 { font-size: 22px; }
 
-  #view-public, #view-article, #view-all-gallery, #view-all-articles, #view-all-karya {
+  #view-public, #view-article {
     display: flex; flex-direction: column; min-height: calc(100vh - 56px);
   }
-  #view-article .footer, #view-all-gallery .footer, #view-all-articles .footer, #view-all-karya .footer {
+  #view-public .footer, #view-article .footer {
     margin-top: auto;
   }
 
